@@ -302,7 +302,7 @@
     font-size: 2rem;
     font-weight: bolder;
     padding: 0 1.5rem;
-    pointer-events: none;
+    pointer-events: auto;
     cursor: pointer;
 }
 
@@ -324,7 +324,7 @@
 
 .instance-select:before {
     transform: rotate(270deg);
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 .info-starting-game {
@@ -417,12 +417,23 @@
     transition: transform 0.3s ease-in-out;
 }
 
-.settings-btn:hover,
-.play-btn:hover {
+.settings-btn:hover{
     transform: scale(1.2);
 }
 
+.play-btn-container:hover {
+    box-shadow: 0 0 15px var(--element-color);
+}
+.play-btn:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s;
+}
 
+.instance-select:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s;
+    box-shadow: 0 0 15px var(--element-color);
+}
 
 /*******************************************************************************
  *                                                                             *

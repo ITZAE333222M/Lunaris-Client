@@ -18,7 +18,10 @@ class Settings {
         this.javaPath()
         this.resolution()
         this.launcher()
+
     }
+
+
 
     navBTN() {
         document.querySelector('.nav-box').addEventListener('click', e => {
