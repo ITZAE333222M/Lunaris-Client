@@ -1,7 +1,7 @@
 {
     "name": "Lunaris-Client",
     "preductname": "Lunaris Client",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "description": "Cliente oficial de Lunaris Studio.",
     "main": "src/app.js",
     "author": {
@@ -21,11 +21,11 @@
         "ignore": "**/test"
     },
     "dependencies": {
+        "discord-rpc": "^4.0.1",
         "electron-updater": "^6.1.8",
         "minecraft-java-core": "^4.1.4",
         "node-bdd": "^2.0.4",
         "node-fetch": "^2.7.0",
-        "skinview3d": "^3.4.1",
         "xml-js": "^1.6.11"
     },
     "devDependencies": {
