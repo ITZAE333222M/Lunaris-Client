@@ -19,6 +19,7 @@ RPC.register(CLIENT_ID);
 const rpc = new RPC.Client({ transport: 'ipc' });
 
 async function setActivity() {
+    if (!rpc) return;
 
     rpc.setActivity({
         startTimestamp: new Date(),
@@ -27,7 +28,7 @@ async function setActivity() {
         smallImageKey: 'icon',
         smallImageText: 'Preparándome para jugar',
         details: 'En el menú principal',
-        instance: false,
+        instance: true,
     });
 }
 
