@@ -30,10 +30,9 @@ class Splash {
 
     async startAnimation() {
         let splashes = [
-            { "message": "Lebiu Studio On Top", "author": "Darken" },
-            { "message": "LewSafio 3!", "author": "Darken" },
-            { "message": "Optimizen MINECRAFT JAVA!!", "author": "Darken" },
-            { "message": "Zephyhosting.com", "author": "Darken" }
+            { "message": "Bienvenido a Lunaris Client", "author": "Darken" },
+            { "message": "WASAAAAAAAAAAAAA!", "author": "Darken" },
+            { "message": "Team Buhoja", "author": "Darken" }
         ];
         let splash = splashes[Math.floor(Math.random() * splashes.length)];
         this.splashMessage.textContent = splash.message;
