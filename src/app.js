@@ -6,10 +6,10 @@
 const { app, ipcMain, nativeTheme } = require('electron');
 const { Microsoft } = require('minecraft-java-core');
 const { autoUpdater } = require('electron-updater')
-
 const path = require('path');
 const fs = require('fs');
 const RPC = require('discord-rpc'); // Importar discord-rpc
+
 const UpdateWindow = require("./assets/js/windows/updateWindow.js");
 const MainWindow = require("./assets/js/windows/mainWindow.js");
 
@@ -42,7 +42,6 @@ rpc.on('ready', () => {
 rpc.login({ clientId: CLIENT_ID }).catch(console.error);
 
 // Configuración del launcher
-
 let dev = process.env.NODE_ENV === 'dev';
 
 if (dev) {
