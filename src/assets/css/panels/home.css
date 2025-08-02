@@ -91,10 +91,11 @@
     align-items: center;
     width: 85%;
     height: 100%;
+    margin-left: 7%;
 }
 
 .titre-tab-new {
-    margin-top: 1rem;
+    margin-top: 1rem;   
     font-size: 2rem;
     padding: 0.5rem 1rem;
     border-radius: 2rem;
@@ -168,30 +169,38 @@
 .social-tab {
     position: absolute;
     display: flex;
-    bottom: 0;
-    right: 0;
+    align-items: center;
+    left: -50px; 
+    bottom: 50px; 
     width: 15%;
     height: calc(80% - 1rem);
     justify-content: center;
     margin-bottom: 1rem;
+    z-index: 10; 
+    pointer-events: auto;
 }
-
 .social-list {
     border-radius: 10px;
     height: 100%;
 }
 
+.social-block:hover {
+    transform: scale(1.2);
+    transition: transform 0.3s ease-in-out;
+}
+
 .social-block {
     display: flex;
-    background: var(--background-transparent);
+    background: transparent;
     width: 90px;
     height: 90px;
-    margin-bottom: 1rem;
+    margin-bottom: 3rem;
     border-radius: 10px;
     font-size: 2rem;
     cursor: pointer;
     align-items: center;
     justify-content: center;
+    gap: 40%; 
 }
 
 .social-block .icon-social {
@@ -202,6 +211,7 @@
     filter: var(--svg-color);
 }
 
+
 /*******************************************************************************
  *                                                                             *
  * sidebar                                                                     *
@@ -210,11 +220,16 @@
 
 .sidebar {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    height: 90px;
+    width: 90px;
+    height: 100vh;
     background: var(--background-transparent);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
 }
 
 .player-options {
@@ -226,6 +241,11 @@
     margin: 0 1.5rem;
 }
 
+.player-options:hover {
+    transform: scale(1.2);
+    transition: transform 0.3s ease-in-out;
+}
+
 .player-head {
     background: url('../../images/default/setve.png'), no-repeat;
     background-size: cover;
@@ -235,6 +255,7 @@
     width: 3rem;
     pointer-events: none;
     border-radius: 15px;
+    margin-top: 10px; 
 }
 
 .player-menu {
@@ -247,7 +268,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    position: absolute; 
+    bottom: 20px;
+    left: 48%;
+    transform: translateX(-50%);
+    width: 100%;
 }
+
 
 .play-instance {
     display: flex;
@@ -259,6 +286,13 @@
     height: 3.2rem;
     padding-right: 1.9rem;
 }
+.play-btn-container {
+    position: fixed;
+    bottom: 20px; 
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10; 
+}
 
 .play-btn {
     border: none;
@@ -269,6 +303,7 @@
     font-weight: bolder;
     padding: 0 1.5rem;
     pointer-events: none;
+    cursor: pointer;
 }
 
 .instance-select {
@@ -319,7 +354,7 @@
     height: 3rem;
     font-size: 3rem;
     color: var(--element-color);
-    margin: 0 1.5rem;
+    margin: 0 1.5rem 10px 1.5rem; 
 }
 
 .instance-popup {
@@ -376,3 +411,22 @@
 .active-instance {
     background: var(--element-color);
 }
+
+.settings-btn,
+.play-btn {
+    transition: transform 0.3s ease-in-out;
+}
+
+.settings-btn:hover,
+.play-btn:hover {
+    transform: scale(1.2);
+}
+
+
+
+/*******************************************************************************
+ *                                                                             *
+ * SkinsTab                                                                     *
+ *                                                                             *
+ ******************************************************************************/
+
