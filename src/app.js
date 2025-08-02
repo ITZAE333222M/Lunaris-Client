@@ -6,39 +6,13 @@
 const { app, ipcMain, nativeTheme } = require('electron');
 const { Microsoft } = require('minecraft-java-core');
 const { autoUpdater } = require('electron-updater')
-const RPC = require('discord-rpc'); // Importar discord-rpc
 
 const path = require('path');
 const fs = require('fs');
 
 const UpdateWindow = require("./assets/js/windows/updateWindow.js");
 const MainWindow = require("./assets/js/windows/mainWindow.js");
-const CLIENT_ID = '1389689026914553967';
-RPC.register(CLIENT_ID);
 
-const rpc = new RPC.Client({ transport: 'ipc' });
-
-async function setActivity() {
-    if (!rpc) return;
-
-    rpc.setActivity({
-        startTimestamp: new Date(),
-        largeImageKey: 'launcher_logo',
-        largeImageText: 'Lunaris Client',
-        smallImageKey: 'icon',
-        smallImageText: 'Preparándome para jugar',
-        details: 'En el menú principal',
-        instance: true,
-    });
-}
-
-rpc.on('ready', () => {
-    console.log('Rich Presence conectado.');
-    setActivity();
-    setInterval(setActivity, 15_000); // Mantén la conexión activa actualizando cada 15 segundos
-});
-
-rpc.login({ clientId: CLIENT_ID }).catch(console.error);
 
 let dev = process.env.NODE_ENV === 'dev';
 
