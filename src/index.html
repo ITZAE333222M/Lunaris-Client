@@ -1,23 +1,23 @@
-<html>
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
+    <title>Lunaris Client</title>
     <link rel="stylesheet" href="assets/css/index.css">
     <style>
+        /* Solo ajustes rápidos en línea, la mayor parte está en index.css */
         body {
             margin: 0;
             padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             background-image: url('./assets/images/background/dark/2.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         #splash {
@@ -30,24 +30,16 @@
             height: 180px;
             margin-bottom: 20px;
         }
-
-        #splash .title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        #splash .progress {
-            width: 80%;
-            height: 20px;
-            margin-top: 15px;
-        }
     </style>
 </head>
 <body>
     <div id="splash">
         <img class="splash" src="assets/images/icon.png" />
-        <p class="title">Iniciando Lunaris Client...</p>
+        <p class="title">Iniciando Lunaris Client</p>
+        <!-- Mensajes dinámicos que usa index.js -->
+        <p class="splash-message"></p>
+        <p class="message"></p>
+        <!-- Barra de progreso -->
         <progress value="0" max="100" class="progress"></progress>
     </div>
     <script src="assets/js/index.js" type="module"></script>
