@@ -19,14 +19,14 @@ function createWindow() {
     destroyWindow();
     updateWindow = new BrowserWindow({
         title: "Actualizar",
-        width: 400,
-        height: 500,
+        width: 1000,
+        height: 600,
         resizable: false,
-        transparent: true, // Hacemos la ventana transparente
+        transparent: true,
         frame: false,
         show: false,
         icon: `./src/assets/images/icon.${os.platform() === "win32" ? "ico" : "png"}`,
-        backgroundColor: '#00000000', // Fondo completamente transparente
+        backgroundColor: '#00000000',
         webPreferences: {
             contextIsolation: false,
             nodeIntegration: true
