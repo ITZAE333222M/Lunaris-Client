@@ -105,14 +105,14 @@ body {
 }
 
 .progress::-webkit-progress-value {
-    background: linear-gradient(90deg, var(--element-color), #0072ff);
+    background: linear-gradient(90deg, var(--element-color), #ffffff);
     border-radius: 10px;
     transition: width 0.2s ease; /* animación suave al actualizar */
 }
 
 /* estilos para Firefox (fallback) */
 .progress::-moz-progress-bar {
-    background: linear-gradient(90deg, var(--element-color), #0072ff);
+    background: linear-gradient(90deg, var(--element-color), #ffffff);
     border-radius: 10px;
     transition: width 0.2s ease;
 }
