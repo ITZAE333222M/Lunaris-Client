@@ -219,7 +219,8 @@
     color: var(--color);
     font-size: 2rem;
     font-weight: bolder;
-    padding: 0 1.5rem;
+    padding: 0 7rem;
+    min-width: 200px;
     cursor: pointer;
     transition: transform 0.3s;
 }
@@ -256,10 +257,20 @@
     text-align: center;
 }
 
+.info-starting-game-text {
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--element-color); /* mismo color de la progress bar */
+    text-align: center;
+}
+
+/* Barra de progreso más grande */
 .progress-bar {
     appearance: none;
-    height: 10px;
+    height: 16px; /* aumentada */
     margin: 0.5rem 0;
+    width: 100%; /* ocupa todo el ancho del recuadro */
 }
 
 .progress-bar::-webkit-progress-bar {
@@ -271,6 +282,27 @@
 .progress-bar::-webkit-progress-value {
     background-color: var(--element-color);
     border-radius: 10px;
+}
+
+
+/* 🔹 Texto del título */
+.starting-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--color);
+    margin-bottom: 0.8rem;
+}
+
+
+/* 🔹 Recuadro gris transparente */
+.starting-box {
+    background: rgba(50, 50, 50, 0.7); /* gris con transparencia */
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 420px;   /* límite de ancho */
+    margin: 1rem auto;
+    text-align: left;   /* alineado a la izquierda */
 }
 
 /* Instance popup */
@@ -339,7 +371,7 @@
     width: 15%;
     height: calc(80% - 1rem);
     justify-content: center;
-    margin-bottom: 8rem;
+    margin-bottom: 10rem;
     z-index: 10; 
     pointer-events: auto;
 }
@@ -354,7 +386,7 @@
     background: transparent;
     width: 90px;
     height: 90px;
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
     border-radius: 10px;
     font-size: 2rem;
     cursor: pointer;
