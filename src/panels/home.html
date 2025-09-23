@@ -49,12 +49,18 @@
             <button class="play-btn">Play</button>
         </div>
         <div class="info-starting-game">
-            <!-- 🔹 NUEVO RECUADRO DE INICIO 🔹 -->
-            <div class="starting-box">
-                <div class="starting-title">INICIANDO MINECRAFT...</div>
-                <div class="info-starting-game-text">Conectando...</div>
-                <progress value="0" max="0" class="progress-bar"></progress>
-            </div>
+    <!-- 🔹 NUEVO RECUADRO DE INICIO 🔹 -->
+    <div class="starting-box">
+        <!-- Columna izquierda: texto + progreso -->
+        <div class="starting-left">
+            <div class="starting-title">INICIANDO MINECRAFT...</div>
+            <div class="info-starting-game-text">Conectando...</div>
+            <progress value="0" max="0" class="progress-bar"></progress>
+        </div>
+
+        <!-- Columna derecha: imagen grande -->
+        <div class="starting-right">
+            <img class="starting-icon-big" src="assets/images/icon.png" alt="Loading Icon">
         </div>
     </div>
 </div>

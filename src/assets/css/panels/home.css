@@ -245,7 +245,6 @@
     margin-top: 490px; /* ajusta este valor según qué tan abajo querís */
 }
 
-
 .instance-select:hover {
     transform: scale(1.1);
     box-shadow: 0 0 15px var(--element-color);
@@ -258,21 +257,24 @@
 }
 
 .info-starting-game-text {
-    margin-bottom: 0.8rem;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--element-color); /* mismo color de la progress bar */
-    text-align: center;
+    font-size: 14px;
+    margin-bottom: 12px;
 }
 
-/* Barra de progreso más grande */
+
+/* Barra de progreso con imagen */
+.progress-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* espacio entre barra y imagen */
+}
+
 .progress-bar {
-    appearance: none;
-    height: 16px; /* aumentada */
-    margin: 0.5rem 0;
-    width: 100%; /* ocupa todo el ancho del recuadro */
+    width: 100%;
+    height: 8px;
+    border-radius: 6px;
+    overflow: hidden;
 }
-
 .progress-bar::-webkit-progress-bar {
     background-color: var(--background);
     border: solid 1px var(--element-color);
@@ -284,6 +286,13 @@
     border-radius: 10px;
 }
 
+/* Imagen cuadrada preview */
+.game-preview {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+}
 
 /* 🔹 Texto del título */
 .starting-title {
@@ -293,16 +302,44 @@
     margin-bottom: 0.8rem;
 }
 
-
 /* 🔹 Recuadro gris transparente */
 .starting-box {
-    background: rgba(50, 50, 50, 0.7); /* gris con transparencia */
-    padding: 1rem 1.5rem;
-    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--background); /* color de fondo que ya usas */
+    padding: 15px;
+    border-radius: 12px;
     width: 100%;
-    max-width: 420px;   /* límite de ancho */
-    margin: 1rem auto;
-    text-align: left;   /* alineado a la izquierda */
+    max-width: 600px; /* ancho del recuadro */
+    margin: 0 auto;
+}
+
+.starting-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1; /* que ocupe el espacio sobrante */
+}
+
+.starting-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.starting-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 20px;
+}
+
+.starting-icon-big {
+    width: 80px;   /* tamaño grande */
+    height: 80px;
+    border-radius: 8px; /* opcional, esquinas suaves */
+    object-fit: cover;
 }
 
 /* Instance popup */
