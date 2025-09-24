@@ -16,7 +16,6 @@
 - Pour utiliser le code votre code doit tout le temps être public.
 - Pour utiliser le code toute mention originale de la licence doit être gardé.
 - Pour utiliser le code vous devez garder la licence originale.
----
 
 ---
 ### **<ins><p align="center">Téléchargement :</p>**

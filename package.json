@@ -1,7 +1,7 @@
 {
     "name": "Lunaris-Client",
     "preductname": "Lunaris Client",
-    "version": "2.0.8",
+    "version": "2.0.9",
     "description": "Cliente oficial de Lunaris Studio.",
     "main": "src/app.js",
     "author": {
