@@ -193,3 +193,37 @@ input::-webkit-inner-spin-button {
     z-index: 1;
     pointer-events: all;
 }
+
+/* Dynamic launcher background */
+body {
+    background-color: var(--background);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    transition: background-image 0.4s ease-in-out, background-color 0.2s linear;
+}
+
+/* Instance selector thumbnail and item styles */
+.instances-List .instance-elements {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+.instances-List .instance-elements:hover {
+    background-color: rgba(255,255,255,0.04);
+}
+.instances-List .instance-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    margin-right: 12px;
+    background-color: rgba(0,0,0,0.12);
+    background-size: cover;
+    background-position: center;
+}
+.instances-List .instance-name {
+    flex: 1;
+}
