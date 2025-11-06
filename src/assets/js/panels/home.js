@@ -19,6 +19,32 @@ class Home {
         document.querySelector('.settings-btn').addEventListener('click', e => changePanel('settings'));
     }
 
+    // Establece el fondo del launcher, con precarga y fallback
+    setBackground(url) {
+        try {
+            if (!url) {
+                document.body.style.backgroundImage = '';
+                this.currentBackground = null;
+                return;
+            }
+
+            const img = new Image();
+            img.onload = () => {
+                document.body.style.backgroundImage = `url('${url}')`;
+                this.currentBackground = url;
+            };
+            img.onerror = () => {
+                console.warn('No se pudo cargar la imagen de fondo:', url);
+                document.body.style.backgroundImage = '';
+                this.currentBackground = null;
+            };
+            img.src = url;
+        } catch (e) {
+            console.warn('Error estableciendo fondo:', e);
+            document.body.style.backgroundImage = '';
+        }
+    }
+
     async news() {
         let newsElement = document.querySelector('.news-list');
         let news = await config.getNews().then(res => res).catch(err => false);
@@ -136,6 +162,12 @@ class Home {
             } else if (instance.name === instanceSelect) setStatus(instance.status);
         }
 
+        // Aplicar fondo inicial de la instancia seleccionada (si existe)
+        try {
+            let currentOption = instancesList.find(i => i.name === instanceSelect);
+            if (currentOption) this.setBackground(currentOption.backgroundUrl || currentOption.background || null);
+        } catch (e) { console.warn('Error aplicando fondo inicial:', e); }
+
         // Botón selector de instancia abre popup
         instanceBTN.addEventListener('click', async () => {
             instancesListPopup.innerHTML = '';
@@ -150,21 +182,53 @@ class Home {
             if (availableInstances.length === 0) {
                 instancesListPopup.innerHTML = `<div class="no-instances">No hay instancias activas disponibles</div>`;
             } else {
+                instancesListPopup.innerHTML = '';
                 for (let instance of availableInstances) {
-                    instancesListPopup.innerHTML += `<div id="${instance.name}" class="instance-elements${instance.name === instanceSelect ? ' active-instance' : ''}">${instance.name}</div>`;
+                    const bg = instance.backgroundUrl || instance.background || '';
+                    const thumbStyle = bg ? `style="background-image: url('${bg}');"` : '';
+                    instancesListPopup.innerHTML += `
+                        <div id="${instance.name}" class="instance-elements${instance.name === instanceSelect ? ' active-instance' : ''}" data-bg="${bg}">
+                            <div class="instance-thumb" ${thumbStyle}></div>
+                            <div class="instance-name">${instance.name}</div>
+                        </div>`;
                 }
             }
+
+            // Prepare hover preview handlers (avoid duplicates by defining once per open)
+            const onHover = e => {
+                const el = e.target.closest('.instance-elements');
+                if (!el) return;
+                const hoverBg = el.dataset.bg;
+                if (hoverBg) this.setBackground(hoverBg);
+            };
+
+            const onLeave = e => {
+                const related = e.relatedTarget;
+                if (!instancesListPopup.contains(related)) {
+                    try {
+                        const currentInstance = instancesList.find(i => i.name === instanceSelect);
+                        this.setBackground(currentInstance?.backgroundUrl || currentInstance?.background || null);
+                    } catch (err) { }
+                }
+            };
+
+            // Remove previous listeners (no-op if not present) and add
+            instancesListPopup.removeEventListener('mouseover', onHover);
+            instancesListPopup.removeEventListener('mouseout', onLeave);
+            instancesListPopup.addEventListener('mouseover', onHover);
+            instancesListPopup.addEventListener('mouseout', onLeave);
 
             instancePopup.style.display = 'flex';
         });
 
         // Selección de instancia en popup
         instancePopup.addEventListener('click', async e => {
-            if (e.target.classList.contains('instance-elements')) {
-                let newInstanceSelect = e.target.id;
+            const instanceEl = e.target.closest('.instance-elements');
+            if (instanceEl) {
+                let newInstanceSelect = instanceEl.id;
                 let active = document.querySelector('.active-instance');
                 if (active) active.classList.remove('active-instance');
-                e.target.classList.add('active-instance');
+                instanceEl.classList.add('active-instance');
 
                 configClient.instance_selct = newInstanceSelect;
                 await this.db.updateData('configClient', configClient);
@@ -172,6 +236,8 @@ class Home {
 
                 let options = instancesList.find(i => i.name === newInstanceSelect);
                 await setStatus(options.status);
+                // Apply background for selected instance
+                try { this.setBackground(options.backgroundUrl || options.background || null); } catch (e) { }
                 instancePopup.style.display = 'none';
             }
         });
