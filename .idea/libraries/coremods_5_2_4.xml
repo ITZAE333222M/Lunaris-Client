@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="coremods-5.2.4">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/data/.LunarisClient/loader/forge/libraries/net/minecraftforge/coremods/5.2.4/coremods-5.2.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

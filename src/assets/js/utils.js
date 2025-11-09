@@ -26,9 +26,49 @@ async function setBackground(theme) {
 
 async function changePanel(id) {
     let panel = document.querySelector(`.${id}`);
+    if (!panel) return;
     let active = document.querySelector(`.active`)
-    if (active) active.classList.toggle("active");
+    // remove active class from currently active panel (use remove to avoid toggle-edge cases)
+    if (active) active.classList.remove("active");
+
+    // Set default launcher background when switching to settings or login
+    if (id === 'settings' || id === 'login') {
+        await setBackground(false);
+    }
+
+    // Cleanup settings-specific UI state when switching away from settings
+    try {
+        if (id !== 'settings') {
+            const activeSettingsBTN = document.querySelector('.active-settings-BTN');
+            const activeContainerSettings = document.querySelector('.active-container-settings');
+            if (activeSettingsBTN) activeSettingsBTN.classList.remove('active-settings-BTN');
+            if (activeContainerSettings) activeContainerSettings.classList.remove('active-container-settings');
+            const cancelHome = document.querySelector('.cancel-home');
+            if (cancelHome) cancelHome.style.display = 'none';
+        }
+    } catch (err) {
+        console.error('changePanel cleanup error', err);
+    }
+
+    // Ensure only the target panel is displayed to avoid overlay issues from positioned children
+    try {
+        const panels = document.querySelectorAll('.panel');
+        panels.forEach(p => {
+            if (p === panel) {
+                p.style.display = 'block';
+            } else {
+                p.style.display = 'none';
+                p.classList.remove('active');
+            }
+        })
+    } catch (err) {
+        // ignore DOM traversal errors
+    }
+
     panel.classList.add("active");
+
+    // Notificar al Rich Presence sobre el cambio de panel
+    ipcRenderer.send('panel-changed', { panelName: id });
 }
 
 async function appdata() {
@@ -61,6 +101,12 @@ async function accountSelect(data) {
     if (activeAccount) activeAccount.classList.toggle('account-select');
     account.classList.add('account-select');
     if (data?.profile?.skins[0]?.base64) headplayer(data.profile.skins[0].base64);
+    
+    // Actualizar nombre del jugador en el home
+    let playerNameLabel = document.querySelector('#player-name-label');
+    if (playerNameLabel) {
+        playerNameLabel.textContent = data.name;
+    }
 }
 
 async function headplayer(skinBase64) {

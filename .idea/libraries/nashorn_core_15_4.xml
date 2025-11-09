@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="nashorn-core-15.4">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/data/.LunarisClient/loader/forge/libraries/org/openjdk/nashorn/nashorn-core/15.4/nashorn-core-15.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

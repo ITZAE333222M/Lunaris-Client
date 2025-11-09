@@ -6,6 +6,7 @@
 import Login from './panels/login.js';
 import Home from './panels/home.js';
 import Settings from './panels/settings.js';
+import Instances from './panels/instances.js';
 
 // import modules
 import { logger, config, changePanel, database, popup, setBackground, accountSelect, addAccount, pkg } from './utils.js';
@@ -27,7 +28,7 @@ class Launcher {
         if (await this.config.error) return this.errorConnect()
         this.db = new database();
         await this.initConfigClient();
-        this.createPanels(Login, Home, Settings);
+        this.createPanels(Login, Home, Settings, Instances);
         this.startLauncher();
     }
 
@@ -169,7 +170,7 @@ class Launcher {
                 } else if (account.meta.type == 'AZauth') {
                     console.log(`Account Type: ${account.meta.type} | Username: ${account.name}`);
                     popupRefresh.openPopup({
-                        title: 'Connexion',
+                        title: 'Conectando',
                         content: `Refresh account Type: ${account.meta.type} | Username: ${account.name}`,
                         color: 'var(--color)',
                         background: false
@@ -193,7 +194,7 @@ class Launcher {
                 } else if (account.meta.type == 'Mojang') {
                     console.log(`Account Type: ${account.meta.type} | Username: ${account.name}`);
                     popupRefresh.openPopup({
-                        title: 'Connexion',
+                        title: 'Conectando...',
                         content: `Refresh account Type: ${account.meta.type} | Username: ${account.name}`,
                         color: 'var(--color)',
                         background: false

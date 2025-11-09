@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jrt-fs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/data/.LunarisClient/runtime/jre-17.0.15-windows-x64/lib/jrt-fs.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

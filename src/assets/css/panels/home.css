@@ -1,38 +1,126 @@
+.home {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
 .home .container {
     display: flex;
+    width: 100%;
     height: 100%;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    background: transparent;
+    background-image: none;
+}
+
+/* ===== PANEL IZQUIERDO: INSTANCIAS ===== */
+.left-panel {
+    display: flex;
     flex-direction: column;
+    width: 120px;
+    background: rgba(26, 26, 25, 0.8);
+    border-right: 2px solid #333;
+    padding: 1rem 0.5rem;
+    gap: 0.8rem;
+    overflow-y: auto;
+    justify-content: space-between;
+}
+
+.instances-header {
+    text-align: center;
+    padding-bottom: 0.8rem;
+    border-bottom: 2px solid #9333EA;
+}
+
+.instances-header h2 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #9333EA;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* Footer con botones de left-panel */
+.left-panel-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: auto;
+    padding-top: 0.8rem;
+    border-top: 2px solid #333;
+}
+
+/* ===== PANEL PRINCIPAL ===== */
+.main-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 2rem;
+    gap: 2rem;
+    justify-content: flex-start;
+}
+
+/* Top section: Server info + Player */
+.top-section {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    gap: 2rem;
+    position: relative;
+    min-height: 80px;
+}
+
+.top-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    width: 100%;
+    height: 60px;
+}
+
+/* Player name card/label */
+.player-name {
+    position: absolute;
+    top: -1.2rem;
+    right: 1.7rem;
+    background: rgba(147, 51, 234, 0.15);
+    border: 1px solid #9333EA;
+    border-radius: 6px;
+    padding: 0.5rem 0.6rem;
+    color: #9333EA;
+    font-weight: bold;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(147, 51, 234, 0.2);
 }
 
 /* Status server */
 .status-server {
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--background);
-    width: 25rem;
-    height: 3rem;
-    color: var(--color);
-    border-radius: 10px;
-    margin-top: 3rem;
-    padding: 1rem;
-    text-align: center;
+    display: none;
 }
 
 .server-status-icon {
     height: 3.3rem;
 }
 
+.server-status-infos {
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+}
+
 .server-status-name {
     font-size: 1.5rem;
     color: var(--color);
+    white-space: nowrap;
 }
 
 .server-status-text {
     font-size: 0.6rem;
-    color: #1AC707;
+    color: #9333EA;
 }
 
 .status-player-count {
@@ -56,7 +144,7 @@
     right: 10px;
     border-radius: 15px;
     border: solid 5px var(--background);
-    background: #1AC707;
+    background: #9333EA;
 }
 
 /* Home bottom */
@@ -78,7 +166,7 @@
 }
 
 .titre-tab-new {
-    margin-top: 1rem;   
+    margin-top: 1rem;
     font-size: 2rem;
     padding: 0.5rem 1rem;
     border-radius: 2rem;
@@ -140,19 +228,9 @@
     font-weight: 700;
 }
 
-/* Sidebar */
+/* Sidebar - HIDDEN (Old UI) */
 .sidebar {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    width: 90px;
-    height: 100vh;
-    background: var(--background-transparent);
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1;
+    display: none !important;
 }
 
 .player-options {
@@ -172,82 +250,194 @@
     transition: var(--transition);
     height: 3rem;
     width: 3rem;
-    border-radius: 50px;
-    margin-top: -30px;       /* subirlo más al tope */
-    border: 5px solid white; /* borde blanco */
+    border-radius: 0;
+    border: 2px solid #9333EA;
+    box-shadow: 0 0 8px rgba(147, 51, 234, 0.3);
+    cursor: pointer;
+    position: absolute;
+    top: -1.2rem;
+    right: -1.4rem;
 }
 
 /* Settings button */
 .settings-btn {
-    width: 3rem;
+    width: 100%;
     height: 3rem;
-    font-size: 3rem;
-    color: var(--element-color);
-    margin: 30px 1.5rem 50px 1.5rem; /* bajar más abajo */
-    transition: transform 0.3s ease-in-out;
+    font-size: 1.5rem;
+    color: #9333EA;
+    background: rgba(147, 51, 234, 0.1);
+    border: 2px solid #9333EA;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .settings-btn:hover {
-    transform: scale(1.2);
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(147, 51, 234, 0.3);
+    background: #9333EA;
+    color: #fff;
 }
 
-/* Play elements */
+/* Actions Section */
+.actions-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    flex: 1;
+    padding-bottom: 0;
+}
+
+/* Play elements - Buttons container */
 .play-elements {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute; 
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    gap: 1rem;
-}
-
-.play-instance {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: solid 3px var(--element-color);
-    border-radius: 15px;
-    height: 3.2rem;
-}
-
-.play-btn {
+    gap: 1.5rem;
+    padding: 2rem;
+    background: transparent;
     border: none;
-    border-radius: 10px;
-    background: none;
-    color: var(--color);
-    font-size: 2rem;
-    font-weight: bolder;
-    padding: 0 7rem;
-    min-width: 200px;
+    border-radius: 12px;
+    flex-wrap: wrap;
+    position: absolute;
+    bottom: -60;
+    left: 45%;
+    transform: translateX(-50%);
+}
+
+/* Play button - Primary */
+.play-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border: 2px solid #9333EA;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #9333EA 0%, #7e22ce 100%);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 0.9rem 2rem;
     cursor: pointer;
-    transition: transform 0.3s;
+    transition: all 0.3s ease;
+    font-family: 'MinecraftTen';
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .play-btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.6);
 }
 
-/* Instance select button */
+.play-btn:active {
+    transform: scale(0.98);
+}
+
+.btn-icon {
+    font-size: 1.3rem;
+}
+
+/* Instance select button - Secondary */
 .instance-select {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: solid 3px var(--element-color);
-    border-radius: 50px;
-    padding: 0 1rem;
-    height: 3.2rem;
-    font-size: 1rem;
-    color: var(--element-color);
+    border: 2px solid #9333EA;
+    border-radius: 8px;
+    background: rgba(147, 51, 234, 0.1);
+    color: #9333EA;
+    font-size: 1.4rem;
+    padding: 0 1.2rem;
     cursor: pointer;
-    transition: transform 0.3s;
-    margin-top: 490px; /* ajusta este valor según qué tan abajo querís */
+    transition: all 0.3s ease;
+    font-weight: bold;
+    width: 100%;
+    height: 3rem;
 }
 
 .instance-select:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 15px var(--element-color);
+    background: #9333EA;
+    color: #fff;
+    box-shadow: 0 0 16px rgba(147, 51, 234, 0.4);
+    transform: scale(1.05);
+}
+
+.instance-select:active {
+    transform: scale(0.98);
+}
+
+/* Code button */
+.code-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #9333EA;
+    border-radius: 8px;
+    background: rgba(147, 51, 234, 0.1);
+    color: #9333EA;
+    font-size: 1.4rem;
+    padding: 0.8rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    min-width: 50px;
+    min-height: 45px;
+    position: absolute;
+    bottom: 2rem;
+    right: -0.5rem;
+}
+
+.code-btn:hover {
+    border-color: #9333EA;
+    color: #fff;
+    background: #9333EA;
+    box-shadow: 0 0 12px rgba(147, 51, 234, 0.3);
+    transform: scale(1.05);
+}
+
+.code-btn:active {
+    transform: scale(0.98);
+}
+
+/* Music button */
+.music-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #9333EA;
+    border-radius: 8px;
+    background: rgba(147, 51, 234, 0.1);
+    color: #9333EA;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    width: 100%;
+    height: 3rem;
+}
+
+.music-btn:hover {
+    background: #9333EA;
+    color: #fff;
+    box-shadow: 0 0 16px rgba(147, 51, 234, 0.4);
+    transform: scale(1.05);
+}
+
+.music-btn:active {
+    transform: scale(0.98);
+}
+
+.music-btn.playing {
+    background: #9333EA;
+    color: #fff;
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.6);
 }
 
 /* Info starting game */
@@ -311,7 +501,7 @@
     padding: 15px;
     border-radius: 12px;
     width: 100%;
-    max-width: 600px; /* ancho del recuadro */
+    max-width: 300px; /* ancho del recuadro */
     margin: 0 auto;
 }
 
@@ -361,6 +551,8 @@
     background: var(--background);
     border-radius: 10px;
     padding: 1rem 3rem;
+    width: min(1000px, 92%);
+    max-width: 1100px;
 }
 
 .close-popup {
@@ -398,51 +590,60 @@
     background: var(--element-color);
 }
 
-/* Social tab */
-.social-tab {
-    position: absolute;
+/* Instance Avatars - Left Panel */
+.instance-avatars {
     display: flex;
-    align-items: center;
-    left: -50px; 
-    bottom: 50px; 
-    width: 15%;
-    height: calc(80% - 1rem);
-    justify-content: center;
-    margin-bottom: 10rem;
-    z-index: 10; 
-    pointer-events: auto;
+    flex-direction: column;
+    align-items: center; /* centra horizontalmente */
+    gap: 10px;
+    padding: 0;
+    border-radius: 0;
+    height: auto;
+    flex: 1;
+    overflow-y: auto;
 }
 
-.social-list {
-    border-radius: 10px;
-    height: 100%;
-}
-
-.social-block {
-    display: flex;
-    background: transparent;
-    width: 90px;
-    height: 90px;
-    margin-bottom: 1rem;
-    border-radius: 10px;
-    font-size: 2rem;
+.instance-avatar {
+    width: 80px; /* tamaño cuadrado */
+    height: 80px;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: var(--background-element);
+    background-position: center;
+    background-size: cover;
+    border: 2px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     cursor: pointer;
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 40%;
+    transition: all 0.2s ease;
+    position: relative;
 }
 
-.social-block:hover {
-    transform: scale(1.2);
-    transition: transform 0.3s ease-in-out;
+.instance-avatar:hover {
+    transform: scale(1.05);
+    border-color: #9333EA;
+    box-shadow: 0 0 12px rgba(147, 51, 234, 0.4);
 }
 
-.social-block .icon-social {
-    pointer-events: none;
-    background-repeat: no-repeat;
-    height: 55%;
-    width: 55%;
-    filter: var(--svg-color);
+.instance-avatar.active {
+    border-color: #9333EA;
+    box-shadow: 0 0 12px rgba(147, 51, 234, 0.5), inset 0 0 8px rgba(147, 51, 234, 0.2);
+}
+
+.instance-avatar.locked {
+    filter: grayscale(85%);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.instance-avatar.locked::after {
+    content: '🔒';
+    position: absolute;
+    font-size: 24px;
+    color: rgba(255,255,255,0.9);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
 
 .no-instances {
@@ -451,3 +652,25 @@
     padding: 1rem;
     text-align: center;
 }
+
+/* Tooltip for instance avatars in the sidebar */
+.instance-tooltip {
+    position: fixed;
+    z-index: 9999;
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    pointer-events: none; /* so it doesn't block hover/click */
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    transition: opacity 0.12s ease;
+}
+
+/* Code button - REMOVED (Moved to instances panel) */
+.code-btn {
+  display: none !important;
+}
+

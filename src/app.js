@@ -8,9 +8,52 @@ const { Microsoft } = require('minecraft-java-core');
 const { autoUpdater } = require('electron-updater')
 const path = require('path');
 const fs = require('fs');
+const RPC = require('discord-rpc'); // Importar discord-rpc
 
 const UpdateWindow = require("./assets/js/windows/updateWindow.js");
 const MainWindow = require("./assets/js/windows/mainWindow.js");
+
+// Configuración de Discord Rich Presence
+const CLIENT_ID = '1389689026914553967';
+RPC.register(CLIENT_ID);
+
+const rpc = new RPC.Client({ transport: 'ipc' });
+
+// Variable para almacenar la instancia actual y el panel actual
+let currentInstance = 'Sin seleccionar';
+let currentPanel = 'home';
+
+async function setActivity(instanceName = currentInstance, panelName = currentPanel) {
+    if (!rpc) return;
+
+    // Definir mensaje según el panel
+    let details = 'En el menú principal';
+    if (panelName === 'settings') {
+        details = 'Configurando Launcher';
+    } else if (panelName === 'login') {
+        details = 'En el login';
+    }
+
+    rpc.setActivity({
+        startTimestamp: new Date(),
+        largeImageKey: 'launcher_logo',
+        largeImageText: 'Lunaris Client',
+        smallImageKey: 'icon',
+        smallImageText: 'Preparándome para jugar',
+        details: details,
+        state: `Jugando: ${instanceName}`,
+        instance: true,
+    });
+}
+
+rpc.on('ready', () => {
+    console.log('Rich Presence conectado.');
+    setActivity();
+});
+
+rpc.login({ clientId: CLIENT_ID }).catch(console.error);
+
+// Configuración del launcher
 
 let dev = process.env.NODE_ENV === 'dev';
 
@@ -69,7 +112,23 @@ ipcMain.handle('is-dark-theme', (_, theme) => {
     return nativeTheme.shouldUseDarkColors;
 })
 
+// Escuchar cambios de instancia para actualizar el Rich Presence
+ipcMain.on('instance-changed', (event, data) => {
+    currentInstance = data.instanceName;
+    setActivity(currentInstance, currentPanel);
+    console.log(`Instancia cambió a: ${currentInstance}`);
+})
+
+// Escuchar cambios de panel para actualizar el Rich Presence
+ipcMain.on('panel-changed', (event, data) => {
+    currentPanel = data.panelName;
+    setActivity(currentInstance, currentPanel);
+    console.log(`Panel cambió a: ${currentPanel}`);
+})
+
 app.on('window-all-closed', () => app.quit());
+
+ 
 
 autoUpdater.autoDownload = false;
 

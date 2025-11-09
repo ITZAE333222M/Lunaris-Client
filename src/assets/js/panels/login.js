@@ -151,29 +151,68 @@ class Login {
     }
 
     async saveData(connectionData) {
+        // Validar que el nombre de usuario esté disponible
+        if (!connectionData || !connectionData.name) {
+            console.error('saveData: connectionData or name is missing', connectionData);
+            const popupError = new popup();
+            popupError.openPopup({
+                title: 'Error',
+                content: 'No se pudo obtener el nombre de usuario. Intenta de nuevo.',
+                color: 'red',
+                options: true
+            });
+            return null;
+        }
+
         const configClient = await this.db.readData('configClient');
         const account = await this.db.createData('accounts', connectionData);
         const instanceSelect = configClient.instance_selct;
         const instancesList = await config.getInstanceList();
+
+        // Select the newly created account
         configClient.account_selected = account.ID;
 
-        for (let instance of instancesList) {
-            if (instance.whitelistActive) {
-                const whitelist = instance.whitelist.find(u => u === account.name);
-                if (whitelist !== account.name && instance.name === instanceSelect) {
-                    const newInstanceSelect = instancesList.find(i => !i.whitelistActive);
-                    if(newInstanceSelect){
-                        configClient.instance_selct = newInstanceSelect.name;
-                        await setStatus(newInstanceSelect.status);
+        // Ensure instance selection respects whitelist after adding account
+        try {
+            for (let instance of instancesList) {
+                if (instance.whitelistActive) {
+                    const whitelist = instance.whitelist.find(u => u === account.name);
+                    if (whitelist !== account.name && instance.name === instanceSelect) {
+                        const newInstanceSelect = instancesList.find(i => !i.whitelistActive);
+                        if (newInstanceSelect) {
+                            configClient.instance_selct = newInstanceSelect.name;
+                            await setStatus(newInstanceSelect.status);
+                        }
                     }
                 }
             }
+        } catch (err) {
+            console.warn('Error while adjusting instance selection for new account:', err);
         }
 
+        // Persist config changes
         await this.db.updateData('configClient', configClient);
-        await addAccount(account);
-        await accountSelect(account);
-        changePanel('home');
+
+        // Update UI; be defensive: if addAccount/accountSelect fail, still attempt to go Home
+        try {
+            await addAccount(account);
+        } catch (err) {
+            console.warn('addAccount failed (UI list update) but account was created:', err);
+        }
+
+        try {
+            await accountSelect(account);
+        } catch (err) {
+            console.warn('accountSelect failed (UI selection) but account was created:', err);
+        }
+
+        try {
+            changePanel('home');
+        } catch (err) {
+            console.error('changePanel to home failed after login:', err);
+        }
+
+        return account;
     }
 }
 

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="fmlloader-1.20.1-47.4.10">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/data/.LunarisClient/loader/forge/libraries/net/minecraftforge/fmlloader/1.20.1-47.4.10/fmlloader-1.20.1-47.4.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

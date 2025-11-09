@@ -1,66 +1,74 @@
 <div class="container">
-    <div class="status-server">
-        <img class="server-status-icon" src="assets/images/icon.png">
-        <div class="server-status-infos">
-            <div class="server-status-name">Lunaris Studio</div>
-            <div class="server-status-text">Ping - 0 ms</div>
+    <!-- Panel izquierdo: Instancias -->
+    <div class="left-panel">
+        <div class="instances-header">
+            <h2>INSTANCIAS</h2>
         </div>
-        <div class="status-player-count">
-            <div class="player-count">0</div>
+        <div class="instance-avatars content-scroll"></div>
+        <div class="left-panel-footer">
+            <button class="music-btn" id="music-btn" title="Reproducir música">
+                <span class="btn-icon">🎵</span>
+            </button>
+            <button class="instance-select">
+                <span class="btn-icon">➕</span>
+            </button>
+            <button class="settings-btn icon-settings"></button>
         </div>
     </div>
 
-    <div class="home-bottom">
-        <div class="social-tab">
-            <div class="social-list content-scroll">
-                <div data-url="https://discord.gg/JpGfEPsBVb" class="social-block">
-                    <div class="icon-discord icon-social"></div>
+    <!-- Panel principal (derecha) -->
+    <div class="main-panel">
+        <!-- Header superior con servidor y settings -->
+        <div class="top-section">
+            <div class="status-server">
+                <img class="server-status-icon" src="assets/images/icon.png">
+                <div class="server-status-infos">
+                    <div class="server-status-name">Lunaris Studio</div>
+                    <div class="server-status-text">Ping - 0 ms</div>
                 </div>
-
-                <div data-url="https://x.com/@Lunaris_Studio_" class="social-block">
-                    <div class="icon-twitter icon-social"></div>
+                <div class="status-player-count">
+                    <div class="player-count">0</div>
                 </div>
+            </div>
+            <div class="top-right">
+                <div class="player-name" id="player-name-label">Usuario</div>
+                <div class="player-head"></div>
+            </div>
+        </div>
 
-                <div data-url="https://www.youtube.com/@Lunaris_Studios-mc" class="social-block">
-                    <div class="icon-youtube icon-social"></div>
+        <!-- Sección de acciones -->
+        <div class="actions-section">
+            <!-- Audio element for instance music -->
+            <audio id="instance-music" preload="none"></audio>
+            
+            <div class="play-elements">
+                <button class="play-btn">
+                    <span class="btn-icon">▶</span> JUGAR
+                </button>
+            </div>
+        </div>
+
+        <!-- Sección de estado -->
+        <div class="info-starting-game">
+            <div class="starting-box">
+                <div class="starting-left">
+                    <div class="starting-title">INICIANDO MINECRAFT...</div>
+                    <div class="info-starting-game-text">Conectando...</div>
+                    <progress value="0" max="0" class="progress-bar"></progress>
+                </div>
+                <div class="starting-right">
+                    <img class="starting-icon-big" src="assets/images/icon.png" alt="Loading Icon">
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="sidebar">
-        <div class="instance-select"><h1>+</h1></div>
-        <div class="settings-btn icon-settings"></div>
-        <div class="player-options">
-            <div class="player-head"></div>
-        </div>
-    </div>
-
+    <!-- Instance popup modal -->
     <div class="instance-popup">
         <div class="instances-tab">
             <div class="close-popup icon-close"></div>
             <p>Select instance...</p>
             <div class="instances-List"></div>
-        </div>
-    </div>
-
-    <div class="play-elements">
-        <div class="play-instance">
-            <button class="play-btn">Play</button>
-        </div>
-        <div class="info-starting-game">
-    <!-- 🔹 NUEVO RECUADRO DE INICIO 🔹 -->
-    <div class="starting-box">
-        <!-- Columna izquierda: texto + progreso -->
-        <div class="starting-left">
-            <div class="starting-title">INICIANDO MINECRAFT...</div>
-            <div class="info-starting-game-text">Conectando...</div>
-            <progress value="0" max="0" class="progress-bar"></progress>
-        </div>
-
-        <!-- Columna derecha: imagen grande -->
-        <div class="starting-right">
-            <img class="starting-icon-big" src="assets/images/icon.png" alt="Loading Icon">
         </div>
     </div>
 </div>

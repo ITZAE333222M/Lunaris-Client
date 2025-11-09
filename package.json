@@ -1,14 +1,14 @@
 {
     "name": "Lunaris-Client",
     "preductname": "Lunaris Client",
-    "version": "2.0.9",
+    "version": "2.1.0",
     "description": "Cliente oficial de Lunaris Studio.",
     "main": "src/app.js",
     "author": {
         "name": "Darken",
         "url": "https://github.com/ITZAE333222M"
     },
-    "url": "http://141.11.34.146:1268/main",
+    "url": "http://mc.paellahosting.com:49158/main",
     "scripts": {
         "start": "cross-env-shell NODE_ENV=dev electron .",
         "dev": "cross-env-shell DEV_TOOL=open nodemon --exec npm start",
@@ -21,6 +21,8 @@
         "ignore": "**/test"
     },
     "dependencies": {
+        "discord-rpc": "^4.0.1",
+        "discord.js": "^14.24.2",
         "dotenv": "^17.2.1",
         "electron-updater": "^6.6.2",
         "minecraft-java-core": "^4.1.5",

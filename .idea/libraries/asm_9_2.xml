@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="asm-9.2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/data/.LunarisClient/loader/forge/libraries/org/ow2/asm/asm/9.2/asm-9.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="1.20.1-forge-47.4.10">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/data/.LunarisClient/loader/forge/versions/1.20.1-forge-47.4.10/1.20.1-forge-47.4.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

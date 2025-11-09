@@ -1,27 +1,30 @@
 /* Contenedor principal */
 .login .container {
     display: flex;
-    align-items: center; /* centrado vertical */
-    justify-content: center; /* centrado horizontal */
+    align-items: center;
+    justify-content: center;
     height: 100%;
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: 'MinecraftTen', Arial, sans-serif;
 }
 
 /* Cada pestaña de login */
 .login-tabs {
-    display: none; /* se mostrará según JS */
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 400px; /* más ancho para ser grande */
-    padding: 30px;
-    background: var(--background, #fff);
-    border-radius: 20px;
+    width: 420px;
+    max-width: 90%;
+    padding: 2.5rem;
+    background: rgba(26, 26, 25, 0.9);
+    border-radius: 15px;
+    border: 2px solid #9333EA;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 0 40px rgba(147, 51, 234, 0.4), inset 0 0 20px rgba(147, 51, 234, 0.1);
+    backdrop-filter: blur(12px);
 }
 
 /* Mostrar pestaña activa */
@@ -31,42 +34,87 @@
 
 /* Texto principal */
 .login-text {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
-    margin-bottom: 15px;
+    color: #9333EA;
+    text-shadow: 0 0 15px rgba(147, 51, 234, 0.6);
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
 }
 
 /* Inputs y botones */
 .input-login .email,
 .input-login .password,
 .A2F {
-    width: 90%;
+    width: 100%;
     margin: 10px 0;
-    padding: 12px;
-    border-radius: 25px;
-    border: 2px solid var(--element-color, #0078D4);
-    background: none;
-    color: var(--color, #000);
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: 2px solid rgba(147, 51, 234, 0.3);
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
     font-size: 1rem;
+    outline: none;
+    transition: all 0.25s ease;
+    font-family: 'MinecraftTen';
+}
+
+.input-login .email:focus,
+.input-login .password:focus,
+.A2F:focus {
+    border-color: #9333EA;
+    box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
+    background: rgba(147, 51, 234, 0.1);
+}
+
+/* Contenedor de botones */
+.login-options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 1.5rem;
+    gap: 1rem;
 }
 
 /* Botones */
-.connect,
-.cancel {
-    width: 90%;
-    padding: 12px;
-    margin: 10px 0;
-    border-radius: 12px;
-    border: 2px solid var(--element-color, #0078D4);
-    background: none;
-    color: var(--color, #000);
+.connect {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid #9333EA;
+    background: linear-gradient(135deg, #9333EA 0%, #7e22ce 100%);
+    color: white;
     font-weight: bold;
+    font-family: 'MinecraftTen';
+    font-size: 1rem;
     cursor: pointer;
-    transition: transform 0.2s ease-in-out;
+    transition: all 0.3s ease;
 }
 
-.connect:hover,
+.connect:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 18px rgba(147, 51, 234, 0.5);
+}
+
+.cancel {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid #9333EA;
+    background: rgba(147, 51, 234, 0.1);
+    color: #9333EA;
+    font-weight: bold;
+    font-family: 'MinecraftTen';
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
 .cancel:hover {
+    background: #9333EA;
+    color: white;
+    box-shadow: 0 0 15px rgba(147, 51, 234, 0.3);
     transform: scale(1.05);
 }
 
@@ -79,49 +127,56 @@
 }
 
 .login-select .main-title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: bold;
-    margin-bottom: 10px;
+    color: #9333EA;
+    text-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
+    margin-bottom: 0.5rem;
 }
 
 .login-select .divider {
-    width: 80%;
-    border: none;
-    border-top: 3px solid #ccc;
-    margin-bottom: 15px;
+    width: 100%;
+    border: 1px solid rgba(147, 51, 234, 0.3);
+    margin: 1rem 0;
 }
 
 .login-select .subtitle {
-    font-size: 1.2rem;
-    margin-bottom: 25px;
-    color: #555;
+    font-size: 1rem;
+    color: #aaa;
+    margin-bottom: 1.5rem;
 }
 
 .login-select .separator {
     display: flex;
     align-items: center;
     width: 100%;
-    text-align: center;
     color: #888;
     font-weight: bold;
-    margin: 20px 0;
+    margin: 1rem 0;
 }
 
 .login-select .separator::before,
 .login-select .separator::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid rgba(147, 51, 234, 0.3);
     margin: 0 10px;
 }
 
-.login-select .connect {
-    width: 100%;
-    text-align: center;
+.login-select .footer {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #777;
 }
 
-.login-select .footer {
-    margin-top: 30px;
-    font-size: 1rem;
-    color: #888;
+/* === ANIMACIÓN DE APARICIÓN === */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

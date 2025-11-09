@@ -1,0 +1,60 @@
+
+<link rel="stylesheet" href="../src/assets/css/panels/instances.css">
+
+<div class="instances-panel-container">
+    <!-- Header -->
+    <div class="instances-header-section">
+        <div class="instances-header-top">
+            <h1 class="instances-title">INSTANCIAS</h1>
+            <button class="instances-close-btn icon-close"></button>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="instances-search-wrapper">
+            <input 
+                type="text"
+                class="instances-search-input"
+                placeholder="Buscar instancias..." 
+                id="instances-search"
+            />
+            <span class="search-icon">🔍</span>
+        </div>
+    </div>
+
+    <!-- Instances Grid -->
+    <div class="instances-content">
+        <div class="instances-grid" id="instances-grid"></div>
+        <div class="instances-empty" id="instances-empty" style="display: none;">
+            <p>No se encontraron instancias</p>
+        </div>
+    </div>
+
+    <!-- Code Redeem Button (Bottom) -->
+    <div class="instances-footer">
+        <button class="redeem-code-btn" id="open-codigo-btn">
+            <span class="btn-icon">+</span>
+        </button>
+    </div>
+
+    <!-- Instance Code Input Container (Modal) -->
+    <div id="codigo-instance-container">
+        <label class="codigo-label">CÓDIGO</label>
+        <input id="codigo-instance" type="text" placeholder="Ingresa código..." />
+        <div id="codigo-message" class="codigo-message"></div>
+        <div class="codigo-buttons-container">
+            <button id="enviar-codigo">ENVIAR</button>
+            <button id="cancelar-codigo">CANCELAR</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Si el panel se carga dinámicamente, forzamos a que el CSS se agregue al <head>
+    const cssPath = "src/assets/css/panels/instances.css";
+    if (!document.querySelector(`link[href="${cssPath}"]`)) {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = cssPath;
+        document.head.appendChild(link);
+    }
+</script>
