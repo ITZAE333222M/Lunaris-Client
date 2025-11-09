@@ -1,5 +1,5 @@
 
-<link rel="stylesheet" href="../src/assets/css/panels/instances.css">
+<link rel="stylesheet" href="../assets/css/panels/instances.css">
 
 <div class="instances-panel-container">
     <!-- Header -->
@@ -50,7 +50,7 @@
 
 <script>
     // Si el panel se carga dinámicamente, forzamos a que el CSS se agregue al <head>
-    const cssPath = "src/assets/css/panels/instances.css";
+    const cssPath = "../assets/css/panels/instances.css";
     if (!document.querySelector(`link[href="${cssPath}"]`)) {
         const link = document.createElement("link");
         link.rel = "stylesheet";
