@@ -264,6 +264,50 @@ input::-webkit-inner-spin-button {
     box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
 }
 
+.popup-option-btn {
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    border: 2px solid;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    background: transparent;
+}
+
+.popup-option-btn.confirm-btn {
+    color: #ff9999;
+    border-color: #ff9999;
+}
+
+.popup-option-btn.confirm-btn:hover {
+    background: rgba(255, 153, 153, 0.1);
+    box-shadow: 0 4px 12px rgba(255, 153, 153, 0.3);
+    transform: translateY(-1px);
+}
+
+.popup-option-btn.confirm-btn:active {
+    transform: translateY(0);
+}
+
+.popup-option-btn.cancel-btn {
+    color: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.popup-option-btn.cancel-btn:hover {
+    color: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+}
+
+.popup-option-btn.cancel-btn:active {
+    transform: translateY(0);
+}
+
 .panel {
     position: absolute;
     top: 0;

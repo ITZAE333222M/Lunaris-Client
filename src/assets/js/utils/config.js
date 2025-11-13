@@ -14,10 +14,16 @@ let news = `${url}/launcher/news/news.json`;
 class Config {
     GetConfig() {
         return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject({ error: { code: 'TIMEOUT', message: 'Connection timeout - server not responding' } });
+            }, 10000); // 10 second timeout
+
             nodeFetch(config).then(async config => {
+                clearTimeout(timeout);
                 if (config.status === 200) return resolve(config.json());
                 else return reject({ error: { code: config.statusText, message: 'server not accessible' } });
             }).catch(error => {
+                clearTimeout(timeout);
                 return reject({ error });
             })
         })

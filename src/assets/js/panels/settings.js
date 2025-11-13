@@ -3,8 +3,7 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0
  */
 
-import { changePanel, accountSelect, database, Slider, config, setStatus, popup, appdata, setBackground } from '../utils.js'
-const { ipcRenderer } = require('electron');
+import { changePanel, database, Slider, popup } from '../utils.js'
 const os = require('os');
 
 class Settings {
@@ -12,50 +11,40 @@ class Settings {
     async init(config) {
         this.config = config;
         this.db = new database();
-        this.navBTN()
-        this.accounts()
-        this.ram()
-        this.javaPath()
-        this.resolution()
-        this.launcher()
+        console.log('Settings init() comenzando');
+        
+        this.navBTN();
+        
+        // Esperar a que currentAccount se complete antes de configurar logout
+        await this.currentAccount();
+        this.logoutBtn();
+        
+        // Las siguientes son async pero pueden ejecutarse en paralelo
+        await Promise.all([
+            this.ram(),
+            this.resolution(),
+            this.launcher()
+        ]);
+        
+        // Listen for login completion to reload account info
+        document.addEventListener('login-completed', async () => {
+            console.log('Login completed event received in settings, reloading account info');
+            try {
+                await this.currentAccount();
+                this.logoutBtn(); // Reinitialize logout button with new account
+            } catch (err) {
+                console.error('Error reloading account in settings after login:', err);
+            }
+        });
+        
+        console.log('Settings init() completado');
     }
 
-
-
     navBTN() {
-        // Handle tab switching
-        document.querySelector('.settings-tabs').addEventListener('click', e => {
-            // Find the closest tab element (in case the click is on an icon or label)
-            const tab = e.target.closest('.settings-tab');
-            if (tab) {
-                let id = tab.id
-
-                let activeSettingsBTN = document.querySelector('.active-tab')
-                let activeContainerSettings = document.querySelector('.active-panel')
-
-                // Normal tab switch: remove previous active classes, then set the clicked one
-                if (activeSettingsBTN) activeSettingsBTN.classList.remove('active-tab');
-                tab.classList.add('active-tab');
-
-                if (activeContainerSettings) activeContainerSettings.classList.remove('active-panel');
-                document.querySelector(`#${id}-tab`).classList.add('active-panel');
-            }
-        })
-
         // Handle close button (save)
         const saveBtn = document.querySelector('#save.settings-close-btn');
         if (saveBtn) {
             saveBtn.addEventListener('click', () => {
-                let activeSettingsBTN = document.querySelector('.active-tab')
-                let activeContainerSettings = document.querySelector('.active-panel')
-
-                // Reset to account tab
-                if (activeSettingsBTN) activeSettingsBTN.classList.remove('active-tab');
-                document.querySelector('#account').classList.add('active-tab');
-
-                if (activeContainerSettings) activeContainerSettings.classList.remove('active-panel');
-                document.querySelector(`#account-tab`).classList.add('active-panel');
-
                 // Hide any temporary UI that could remain (e.g., cancel button in login)
                 const cancelHome = document.querySelector('.cancel-home');
                 if (cancelHome) cancelHome.style.display = 'none';
@@ -65,80 +54,158 @@ class Settings {
         }
     }
 
-    accounts() {
-        document.querySelector('.accounts-list').addEventListener('click', async e => {
-            let popupAccount = new popup()
+    logoutBtn() {
+        // Manejar botón de cerrar sesión
+        let logoutBtn = document.querySelector('.logout-btn');
+        console.log('logoutBtn() called, elemento encontrado:', !!logoutBtn);
+        
+        if (!logoutBtn) {
+            console.warn('Elemento .logout-btn no encontrado');
+            return;
+        }
+
+        // Remover event listeners anteriores clonando el nodo
+        let newLogoutBtn = logoutBtn.cloneNode(true);
+        if (logoutBtn.parentNode) {
+            logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+        }
+        logoutBtn = newLogoutBtn;
+        console.log('Event listeners limpios, agregando nuevo listener');
+
+        const handleLogout = async (e) => {
+            console.log('Botón logout clickeado', e);
+            e.preventDefault();
+            e.stopPropagation();
+            
             try {
-                let id = e.target.id
-                if (e.target.classList.contains('account')) {
-                    popupAccount.openPopup({
-                        title: 'Conectando',
-                        content: 'Espere por favor...',
-                        color: 'var(--color)'
-                    })
-
-                    if (id == 'add') {
-                        document.querySelector('.cancel-home').style.display = 'inline'
-                        return changePanel('login')
+                let configClient = await this.db.readData('configClient');
+                let account = await this.db.readData('accounts', configClient.account_selected);
+                
+                console.log('Abriendo popup de confirmación para:', account?.name);
+                
+                const confirmPopup = new popup();
+                const confirmed = await confirmPopup.openConfirm({
+                    title: 'Cerrar Sesión',
+                    content: `¿Estás seguro de que quieres cerrar sesión de <strong>${account?.name || 'Usuario'}</strong>?`,
+                    confirmText: 'Sí, cerrar sesión',
+                    cancelText: 'Cancelar',
+                    color: '#ff9999'
+                });
+                
+                console.log('Resultado del popup:', confirmed);
+                
+                if (confirmed) {
+                    console.log('Eliminando cuenta:', configClient.account_selected);
+                    // Eliminar la cuenta actual
+                    await this.db.deleteData('accounts', configClient.account_selected);
+                    
+                    // Esperar un poco para que la base de datos se actualice
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                    // Verificar si hay más cuentas
+                    let allAccounts = await this.db.readAllData('accounts');
+                    console.log('Cuentas restantes:', allAccounts?.length || 0);
+                    
+                    if (allAccounts && allAccounts.length > 0) {
+                        // Si hay más cuentas, seleccionar la primera
+                        console.log('Seleccionando nueva cuenta:', allAccounts[0].name);
+                        configClient.account_selected = allAccounts[0].ID;
+                        await this.db.updateData('configClient', configClient);
+                        
+                        // Actualizar UI con pequeño delay
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                        
+                        // Iniciar transición suave
+                        let playerNameLabel = document.querySelector('#player-name-label');
+                        let playerHead = document.querySelector('.player-head');
+                        let currentPlayerHead = document.querySelector('.current-player-head');
+                        
+                        // Fade out
+                        if (playerNameLabel) playerNameLabel.classList.add('transitioning');
+                        if (playerHead) playerHead.classList.add('transitioning');
+                        if (currentPlayerHead) currentPlayerHead.classList.add('transitioning');
+                        
+                        // Esperar a que termine el fade out
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        
+                        // Actualizar datos
+                        await this.currentAccount();
+                        this.logoutBtn(); // Reinicializar el listener con la nueva cuenta
+                        
+                        // Actualizar nombre en home
+                        if (playerNameLabel) {
+                            playerNameLabel.textContent = allAccounts[0].name;
+                        }
+                        
+                        // Actualizar avatar en home
+                        if (allAccounts[0]?.profile?.skins[0]?.base64) {
+                            let skin = await this.getHeadTexture(allAccounts[0].profile.skins[0].base64);
+                            if (playerHead) {
+                                playerHead.style.backgroundImage = `url(${skin})`;
+                            }
+                        }
+                        
+                        // Fade in
+                        if (playerNameLabel) playerNameLabel.classList.remove('transitioning');
+                        if (playerHead) playerHead.classList.remove('transitioning');
+                        if (currentPlayerHead) currentPlayerHead.classList.remove('transitioning');
+                        
+                        console.log('Logout completado exitosamente, nueva cuenta seleccionada');
+                    } else {
+                        // Si no hay más cuentas, ir a login
+                        console.log('Sin más cuentas, yendo a login');
+                        changePanel('login');
                     }
-
-                    let account = await this.db.readData('accounts', id);
-                    let configClient = await this.setInstance(account);
-                    await accountSelect(account);
-                    configClient.account_selected = account.ID;
-                    return await this.db.updateData('configClient', configClient);
-                }
-
-                if (e.target.classList.contains("delete-profile")) {
-                    popupAccount.openPopup({
-                        title: 'Conectando...',
-                        content: 'Espere por favor...',
-                        color: 'var(--color)'
-                    })
-                    await this.db.deleteData('accounts', id);
-                    let deleteProfile = document.getElementById(`${id}`);
-                    let accountListElement = document.querySelector('.accounts-list');
-                    accountListElement.removeChild(deleteProfile);
-
-                    if (accountListElement.children.length == 1) return changePanel('login');
-
-                    let configClient = await this.db.readData('configClient');
-
-                    if (configClient.account_selected == id) {
-                        let allAccounts = await this.db.readAllData('accounts');
-                        configClient.account_selected = allAccounts[0].ID
-                        accountSelect(allAccounts[0]);
-                        let newInstanceSelect = await this.setInstance(allAccounts[0]);
-                        configClient.instance_selct = newInstanceSelect.instance_selct
-                        return await this.db.updateData('configClient', configClient);
-                    }
+                } else {
+                    console.log('Logout cancelado por el usuario');
                 }
             } catch (err) {
-                console.error(err)
-            } finally {
-                popupAccount.closePopup();
+                console.error('Error durante logout:', err);
+                alert('Error al cerrar sesión: ' + err.message);
             }
-        })
+        };
+
+        // Agregar listener al botón
+        logoutBtn.addEventListener('click', handleLogout);
+        
+        // También agregar listener a los spans por si el click va ahí
+        const spans = logoutBtn.querySelectorAll('span');
+        spans.forEach(span => {
+            span.addEventListener('click', handleLogout);
+        });
+        
+        console.log('Listeners agregados al botón y sus spans');
     }
 
-    async setInstance(auth) {
-        let configClient = await this.db.readData('configClient')
-        let instanceSelect = configClient.instance_selct
-        let instancesList = await config.getInstanceList()
+    async currentAccount() {
+        try {
+            let configClient = await this.db.readData('configClient');
+            let account = await this.db.readData('accounts', configClient.account_selected);
+            
+            // Actualizar nombre de la cuenta
+            let accountNameElement = document.querySelector('#current-account-name');
+            if (accountNameElement && account) {
+                accountNameElement.textContent = account.name;
+            }
 
-        for (let instance of instancesList) {
-            if (instance.whitelistActive) {
-                let whitelist = instance.whitelist.find(whitelist => whitelist == auth.name)
-                if (whitelist !== auth.name) {
-                    if (instance.name == instanceSelect) {
-                        let newInstanceSelect = instancesList.find(i => i.whitelistActive == false)
-                        configClient.instance_selct = newInstanceSelect.name
-                        await setStatus(newInstanceSelect.status)
-                    }
+            // Actualizar avatar de la cuenta
+            if (account?.profile?.skins[0]?.base64) {
+                let skin = await this.getHeadTexture(account.profile.skins[0].base64);
+                let playerHead = document.querySelector('.current-player-head');
+                if (playerHead) {
+                    playerHead.style.backgroundImage = `url(${skin})`;
                 }
             }
+        } catch (err) {
+            console.error('Error loading current account:', err);
         }
-        return configClient
+    }
+
+    async getHeadTexture(skinBase64) {
+        // Importar skin2D dinámicamente
+        const { skin2D } = await import('../utils.js');
+        let skinRenderer = new skin2D();
+        return await skinRenderer.creatHeadTexture(skinBase64);
     }
 
     async ram() {
@@ -159,7 +226,7 @@ class Settings {
 
         if (totalMem < ram.ramMin) {
             config.java_config.java_memory = { min: 1, max: 2 };
-            this.db.updateData('configClient', config);
+            await this.db.updateData('configClient', config);
             ram = { ramMin: "1", ramMax: "2" }
         };
 
@@ -176,44 +243,7 @@ class Settings {
             minSpan.setAttribute("value", `${min} Go`);
             maxSpan.setAttribute("value", `${max} Go`);
             config.java_config.java_memory = { min: min, max: max };
-            this.db.updateData('configClient', config);
-        });
-    }
-
-    async javaPath() {
-        let javaPathText = document.querySelector(".java-path-txt")
-        javaPathText.textContent = `${await appdata()}/${process.platform == 'darwin' ? this.config.dataDirectory : `.${this.config.dataDirectory}`}/runtime`;
-
-        let configClient = await this.db.readData('configClient')
-        let javaPath = configClient?.java_config?.java_path || 'Usar la versión de java incluida con el launcher';
-        let javaPathInputTxt = document.querySelector(".java-path-input-text");
-        let javaPathInputFile = document.querySelector(".java-path-input-file");
-        javaPathInputTxt.value = javaPath;
-
-        document.querySelector(".java-path-set").addEventListener("click", async () => {
-            javaPathInputFile.value = '';
-            javaPathInputFile.click();
-            await new Promise((resolve) => {
-                let interval;
-                interval = setInterval(() => {
-                    if (javaPathInputFile.value != '') resolve(clearInterval(interval));
-                }, 100);
-            });
-
-            if (javaPathInputFile.value.replace(".exe", '').endsWith("java") || javaPathInputFile.value.replace(".exe", '').endsWith("javaw")) {
-                let configClient = await this.db.readData('configClient')
-                let file = javaPathInputFile.files[0].path;
-                javaPathInputTxt.value = file;
-                configClient.java_config.java_path = file
-                await this.db.updateData('configClient', configClient);
-            } else alert("El nombre del archivo debe ser java o javaw");
-        });
-
-        document.querySelector(".java-path-reset").addEventListener("click", async () => {
-            let configClient = await this.db.readData('configClient')
-            javaPathInputTxt.value = 'Usar la versión de java incluida con el launcher';
-            configClient.java_config.java_path = null
-            await this.db.updateData('configClient', configClient);
+            await this.db.updateData('configClient', config);
         });
     }
 

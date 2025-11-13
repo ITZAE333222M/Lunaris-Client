@@ -14,10 +14,14 @@ class Home {
         this.config = config;
         this.db = new database();
         this.lastWhitelistState = null;
+        
+        // Load and display current account info
+        await this.loadCurrentAccount();
+        
         this.news();
         // Render instance avatars in the sidebar (replaces social icons)
-        this.renderSidebarAvatars();
-        this.instancesSelect();
+        await this.renderSidebarAvatars();
+        await this.instancesSelect();
         document.querySelector('.settings-btn').addEventListener('click', e => changePanel('settings'));
         
         // Listen for instance updates from code redemption
@@ -35,8 +39,48 @@ class Home {
             }
         });
 
+        // Listen for login completion to reload instances immediately
+        document.addEventListener('login-completed', async (e) => {
+            console.log('Login completed event received, reloading instances and profile');
+            try {
+                await this.loadCurrentAccount();
+                await this.renderSidebarAvatars();
+                await this.instancesSelect();
+                console.log('Instances and profile reloaded after login');
+            } catch (err) {
+                console.error('Error reloading after login:', err);
+            }
+        });
+
         // Start whitelist watcher to detect changes without restarting
         this.startWhitelistWatcher();
+    }
+
+    async loadCurrentAccount() {
+        try {
+            let configClient = await this.db.readData('configClient');
+            let account = await this.db.readData('accounts', configClient.account_selected);
+            
+            if (account) {
+                // Actualizar nombre del jugador
+                let playerNameLabel = document.querySelector('#player-name-label');
+                if (playerNameLabel) {
+                    playerNameLabel.textContent = account.name;
+                }
+                
+                // Actualizar avatar del jugador
+                if (account?.profile?.skins[0]?.base64) {
+                    const { skin2D } = await import('../utils/skin.js');
+                    let skin = await new skin2D().creatHeadTexture(account.profile.skins[0].base64);
+                    let playerHead = document.querySelector('.player-head');
+                    if (playerHead) {
+                        playerHead.style.backgroundImage = `url(${skin})`;
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Error loading current account:', err);
+        }
     }
 
     startWhitelistWatcher() {
@@ -110,26 +154,33 @@ class Home {
     // Establece el fondo del launcher, con precarga y fallback
     setBackground(url) {
         try {
+            const mainPanel = document.querySelector('.main-panel');
+            if (!mainPanel) return;
+
             if (!url) {
-                document.body.style.backgroundImage = '';
+                mainPanel.style.backgroundImage = '';
                 this.currentBackground = null;
                 return;
             }
 
             const img = new Image();
             img.onload = () => {
-                document.body.style.backgroundImage = `url('${url}')`;
+                mainPanel.style.backgroundImage = `url('${url}')`;
+                mainPanel.style.backgroundSize = 'cover';
+                mainPanel.style.backgroundPosition = 'center';
+                mainPanel.style.backgroundRepeat = 'no-repeat';
                 this.currentBackground = url;
             };
             img.onerror = () => {
                 console.warn('No se pudo cargar la imagen de fondo:', url);
-                document.body.style.backgroundImage = '';
+                mainPanel.style.backgroundImage = '';
                 this.currentBackground = null;
             };
             img.src = url;
         } catch (e) {
             console.warn('Error estableciendo fondo:', e);
-            document.body.style.backgroundImage = '';
+            const mainPanel = document.querySelector('.main-panel');
+            if (mainPanel) mainPanel.style.backgroundImage = '';
         }
     }
 

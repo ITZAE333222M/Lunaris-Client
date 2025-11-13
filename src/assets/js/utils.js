@@ -91,11 +91,22 @@ async function addAccount(data) {
             <div class="icon-account-delete delete-profile-icon"></div>
         </div>
     `
-    return document.querySelector('.accounts-list').appendChild(div);
+    let accountsList = document.querySelector('.accounts-list');
+    if (accountsList) {
+        return accountsList.appendChild(div);
+    } else {
+        console.warn('[addAccount] accounts-list element not found, deferring UI update');
+        return null;
+    }
 }
 
 async function accountSelect(data) {
     let account = document.getElementById(`${data.ID}`);
+    if (!account) {
+        console.warn(`[accountSelect] Account element not found for ID: ${data.ID}, deferring UI update`);
+        return;
+    }
+    
     let activeAccount = document.querySelector('.account-select')
 
     if (activeAccount) activeAccount.classList.toggle('account-select');

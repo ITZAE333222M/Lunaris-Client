@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: row;
     height: 100%;
-    background: linear-gradient(135deg, var(--background) 0%, rgba(0,0,0,0.1) 100%);
+    background: rgba(26, 26, 25, 1);
     gap: 0;
     overflow: hidden;
 }
@@ -11,7 +11,7 @@
 /* Header */
 .settings-header {
     padding: 1.5rem 1rem;
-    background: rgba(26, 26, 25, 0.8);
+    background: rgba(26, 26, 25, 1);
     border-right: 2px solid #333;
     display: flex;
     flex-direction: column;
@@ -434,6 +434,77 @@
     background: linear-gradient(135deg, rgba(179, 102, 255, 0.2) 0%, rgba(0,0,0,0.3) 100%);
 }
 
+/* Current Account Info */
+.current-account-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.5rem;
+}
+
+.account-avatar {
+    flex-shrink: 0;
+}
+
+.current-player-head {
+    width: 80px;
+    height: 80px;
+    background: url(../../images/default/setve.png);
+    background-size: cover;
+    border-radius: 10px;
+    image-rendering: pixelated;
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+    border: 2px solid rgba(147, 51, 234, 0.3);
+}
+
+.account-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.account-name-label {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.account-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #b366ff;
+    word-break: break-word;
+}
+
+.logout-btn {
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(135deg, rgba(240, 71, 71, 0.2) 0%, rgba(0,0,0,0.3) 100%);
+    border: 2px solid rgba(240, 71, 71, 0.3);
+    border-radius: 10px;
+    color: #ff9999;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, rgba(240, 71, 71, 0.3) 0%, rgba(0,0,0,0.4) 100%);
+    border-color: #ff9999;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(240, 71, 71, 0.3);
+}
+
+.logout-btn:active {
+    transform: translateY(0);
+}
+
 /* RAM Slider */
 .memory-slider-container {
     flex: 1;
@@ -828,4 +899,110 @@
     flex-wrap: wrap;
     gap: 2rem;
     width: 100%;
+}
+
+/* Developers Grid Container */
+.developers-container {
+    grid-column: 1 / -1;
+}
+
+.developers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem !important;
+    padding: 0 !important;
+}
+
+/* Developer Card Vertical Style */
+.developer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.15) 0%, rgba(0, 0, 0, 0.2) 100%);
+    border: 2px solid rgba(147, 51, 234, 0.3);
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    text-decoration: none;
+    color: inherit;
+}
+
+.developer-card:hover {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.25) 0%, rgba(0, 0, 0, 0.3) 100%);
+    border-color: #9333EA;
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(147, 51, 234, 0.3);
+}
+
+.developer-profile-image {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(147, 51, 234, 0.2);
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+}
+
+.developer-profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.developer-avatar {
+    font-size: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.developer-info-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.developer-role {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.developer-name {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #b366ff;
+    letter-spacing: 0.3px;
+}
+
+.developer-credit {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Smooth transition for account switching */
+.player-head,
+.current-player-head,
+#player-name-label {
+    transition: opacity 0.3s ease;
+}
+
+.player-head.transitioning,
+.current-player-head.transitioning,
+#player-name-label.transitioning {
+    opacity: 0;
 }

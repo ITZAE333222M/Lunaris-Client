@@ -91,13 +91,27 @@ class Login {
                     popupLogin.closePopup();
                     return;
                 }
-                await this.saveData(account_connect);
+                try {
+                    await this.saveData(account_connect);
+                } catch (err) {
+                    console.error('Error saving Microsoft account:', err);
+                    popupLogin.openPopup({
+                        title: 'Error',
+                        content: 'No se pudo guardar la cuenta de Microsoft. Intenta de nuevo.',
+                        options: true,
+                        color: 'red'
+                    });
+                    return;
+                }
                 popupLogin.closePopup();
             }).catch(err => {
+                console.error('Microsoft login error:', err);
+                popupLogin.closePopup();
                 popupLogin.openPopup({
-                    title: 'Error',
-                    content: err,
-                    options: true
+                    title: 'Error de Inicio de Sesión',
+                    content: `No se pudo conectar con Microsoft. Asegúrate de tener una conexión a internet activa.\n\nDetalles: ${err?.message || err || 'Error desconocido'}`,
+                    options: true,
+                    color: 'red'
                 });
             });
         });
@@ -208,6 +222,14 @@ class Login {
 
         try {
             changePanel('home');
+            
+            // Disparar evento para que home recargue las instancias inmediatamente
+            setTimeout(() => {
+                document.dispatchEvent(new CustomEvent('login-completed', {
+                    detail: { account: account, configClient: configClient }
+                }));
+                console.log('Login completado, event dispatcheado');
+            }, 100);
         } catch (err) {
             console.error('changePanel to home failed after login:', err);
         }

@@ -62,4 +62,52 @@ export default class popup {
             this.popup.classList.remove('hidden');
         }, 300);
     }
+
+    openConfirm(options) {
+        return new Promise((resolve) => {
+            this.isClosing = false;
+            this.popup.classList.remove('hidden');
+            this.popup.style.display = 'flex';
+            
+            this.popupTitle.innerHTML = options.title;
+            
+            // Aplicar color especial si está especificado
+            if (options.color && options.color !== 'var(--color)') {
+                this.popupContent.style.color = options.color;
+            } else {
+                this.popupContent.style.color = 'rgba(255, 255, 255, 0.85)';
+            }
+            
+            this.popupContent.innerHTML = options.content;
+
+            // Mostrar opciones y configurar los botones
+            this.popupOptions.style.display = 'flex';
+            
+            // Limpiar y recrear los botones
+            this.popupOptions.innerHTML = '';
+            
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'popup-option-btn confirm-btn';
+            confirmBtn.textContent = options.confirmText || 'Confirmar';
+            confirmBtn.style.color = options.color || 'rgba(255, 255, 255, 0.85)';
+            confirmBtn.style.borderColor = options.color || 'rgba(255, 255, 255, 0.85)';
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'popup-option-btn cancel-btn';
+            cancelBtn.textContent = options.cancelText || 'Cancelar';
+            
+            confirmBtn.addEventListener('click', () => {
+                this.closePopup();
+                resolve(true);
+            });
+            
+            cancelBtn.addEventListener('click', () => {
+                this.closePopup();
+                resolve(false);
+            });
+            
+            this.popupOptions.appendChild(confirmBtn);
+            this.popupOptions.appendChild(cancelBtn);
+        });
+    }
 }
