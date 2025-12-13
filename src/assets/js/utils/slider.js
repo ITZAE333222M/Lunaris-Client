@@ -32,7 +32,12 @@ export default class Slider {
 
         this.maxX = this.slider.offsetWidth - this.touchRight.offsetWidth;
         this.selectedTouch = null;
-        this.initialValue = this.lineSpan.offsetWidth - this.normalizeFact;
+        
+        let lineWidth = this.lineSpan.offsetWidth;
+        if (lineWidth <= this.normalizeFact || isNaN(lineWidth)) {
+            lineWidth = this.slider.offsetWidth;
+        }
+        this.initialValue = Math.max(lineWidth - this.normalizeFact, 1);
 
         this.setMinValue(this.minValue);
         this.setMaxValue(this.maxValue);
@@ -53,17 +58,24 @@ export default class Slider {
     }
 
     setMinValue(minValue) {
+        minValue = Math.max(this.min, Math.min(minValue, this.max));
         let ratio = (minValue - this.min) / (this.max - this.min);
-        this.touchLeft.style.left = Math.ceil(ratio * (this.slider.offsetWidth - (this.touchLeft.offsetWidth + this.normalizeFact))) + 'px';
+        ratio = Math.max(0, Math.min(ratio, 1));
+        let leftPos = Math.max(0, Math.ceil(ratio * (this.slider.offsetWidth - (this.touchLeft.offsetWidth + this.normalizeFact))));
+        this.touchLeft.style.left = leftPos + 'px';
         this.lineSpan.style.marginLeft = this.touchLeft.offsetLeft + 'px';
-        this.lineSpan.style.width = (this.touchRight.offsetLeft - this.touchLeft.offsetLeft) + 'px';
+        this.lineSpan.style.width = Math.max(0, (this.touchRight.offsetLeft - this.touchLeft.offsetLeft)) + 'px';
     }
 
     setMaxValue(maxValue) {
+        maxValue = Math.max(this.min, Math.min(maxValue, this.max));
         var ratio = (maxValue - this.min) / (this.max - this.min);
-        this.touchRight.style.left = Math.ceil(ratio * (this.slider.offsetWidth - (this.touchLeft.offsetWidth + this.normalizeFact)) + this.normalizeFact) + 'px';
+        ratio = Math.max(0, Math.min(ratio, 1));
+        let rightPos = Math.max(0, Math.ceil(ratio * (this.slider.offsetWidth - (this.touchLeft.offsetWidth + this.normalizeFact)) + this.normalizeFact));
+        rightPos = Math.min(rightPos, this.slider.offsetWidth);
+        this.touchRight.style.left = rightPos + 'px';
         this.lineSpan.style.marginLeft = this.touchLeft.offsetLeft + 'px';
-        this.lineSpan.style.width = (this.touchRight.offsetLeft - this.touchLeft.offsetLeft) + 'px';
+        this.lineSpan.style.width = Math.max(0, (this.touchRight.offsetLeft - this.touchLeft.offsetLeft)) + 'px';
     }
 
     onStart(elem, event) {
@@ -130,6 +142,13 @@ export default class Slider {
 
         minValue = minValue * (this.max - this.min) + this.min;
         maxValue = maxValue * (this.max - this.min) + this.min;
+
+        minValue = Math.max(this.min, Math.min(minValue, this.max));
+        maxValue = Math.max(this.min, Math.min(maxValue, this.max));
+        
+        if (minValue > maxValue) {
+            [minValue, maxValue] = [maxValue, minValue];
+        }
 
         if (this.step != 0.0) {
             let multi = Math.floor(minValue / this.step);

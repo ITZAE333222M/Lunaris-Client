@@ -517,6 +517,7 @@
     width: 100%;
     user-select: none;
     margin: 1rem 0;
+    overflow: visible;
 }
 
 .slider-touch-left,
@@ -527,6 +528,8 @@
     z-index: 5;
     cursor: grab;
     top: 0;
+    min-left: 0;
+    max-right: 0;
 }
 
 .slider-touch-left span,

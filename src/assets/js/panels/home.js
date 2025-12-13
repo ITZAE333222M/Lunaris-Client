@@ -2,7 +2,7 @@
  * @author Darken
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0
  */
-import { config, database, logger, changePanel, appdata, setStatus, pkg, popup } from '../utils.js'
+import { config, database, logger, changePanel, appdata, setStatus, pkg, Notification } from '../utils.js'
 
 const { Launch } = require('minecraft-java-core')
 const { shell, ipcRenderer } = require('electron')
@@ -129,13 +129,8 @@ class Home {
                             await this.db.updateData('configClient', configClient);
                             setStatus(accessibleInstance.status);
                             
-                            // Show notification
-                            let popupMsg = new popup();
-                            popupMsg.openPopup({ 
-                                title: 'Acceso eliminado', 
-                                content: `Fuiste removido de ${currentInstance.name}. Cambié a ${accessibleInstance.name}.`, 
-                                color: 'orange' 
-                            });
+                            const notif = new Notification();
+                            notif.warning(`Fuiste removido de ${currentInstance.name}. Cambié a ${accessibleInstance.name}.`);
                         }
                     }
 
@@ -402,8 +397,8 @@ class Home {
                         if (locked) {
                             // feedback for whitelist locked instance
                             console.warn(`Instancia ${instance.name} bloqueada para el usuario ${auth?.name}`);
-                            let popupMsg = new popup();
-                            popupMsg.openPopup({ title: 'Acceso denegado', content: `No tienes acceso a la instancia ${instance.name}.`, color: 'orange' });
+                            const notif = new Notification();
+                            notif.warning(`No tienes acceso a la instancia ${instance.name}.`);
                             return;
                         }
 
@@ -415,6 +410,10 @@ class Home {
                         // persist selection
                         configClient.instance_selct = instance.name;
                         await this.db.updateData('configClient', configClient);
+
+                        // Show notification with instance name
+                        const notif = new Notification();
+                        notif.info(`Instancia seleccionada: ${instance.name}`);
 
                         // Notificar al Rich Presence sobre el cambio de instancia
                         ipcRenderer.send('instance-changed', { instanceName: instance.name });
@@ -530,16 +529,18 @@ class Home {
         const infoStarting = document.querySelector(".info-starting-game-text");
         const progressBar = document.querySelector('.progress-bar');
 
+        const notifGame = new Notification();
+        
         // Basic validations before building the launch options
         if (!options) {
             console.error('startGame: no options found for selected instance', configClient.instance_selct);
-            new popup().openPopup({ title: 'Error', content: 'No se encontró la instancia seleccionada. Revise la configuración.', color: 'red', options: true });
+            notifGame.error('No se encontró la instancia seleccionada. Revise la configuración.');
             return;
         }
 
         if (!authenticator) {
             console.error('startGame: no authenticator/account selected');
-            new popup().openPopup({ title: 'Error', content: 'No hay una cuenta seleccionada. Inicie sesión primero.', color: 'red', options: true });
+            notifGame.error('No hay una cuenta seleccionada. Inicie sesión primero.');
             return;
         }
 
@@ -612,8 +613,7 @@ class Home {
             new logger(pkg.name, '#7289da');
         });
         launch.on('error', err => {
-            let popupError = new popup();
-            popupError.openPopup({ title: 'Error', content: err?.error || err?.message || String(err), color: 'red', options: true });
+            notifGame.error(err?.error || err?.message || String(err));
             ipcRenderer.send('main-window-progress-reset');
             if (infoStartingBOX) infoStartingBOX.style.display = "none";
             if (playInstanceBTN) playInstanceBTN.style.display = "flex";
@@ -647,8 +647,7 @@ class Home {
             console.log('launch.Launch invoked successfully');
         } catch (launchErr) {
             console.error('launch.Launch threw an exception:', launchErr);
-            let popupError = new popup();
-            popupError.openPopup({ title: 'Error al lanzar', content: launchErr?.message || String(launchErr), color: 'red', options: true });
+            notifGame.error(`Error al lanzar: ${launchErr?.message || String(launchErr)}`);
             ipcRenderer.send('main-window-progress-reset');
             if (infoStartingBOX) infoStartingBOX.style.display = "none";
             if (playInstanceBTN) playInstanceBTN.style.display = "flex";

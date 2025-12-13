@@ -2,7 +2,7 @@
  * @author Darken
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0
  */
-import { config, database, changePanel, setStatus, popup } from '../utils.js'
+import { config, database, changePanel, setStatus, Notification } from '../utils.js'
 const { ipcRenderer } = require('electron')
 
 class Instances {
@@ -258,15 +258,17 @@ filterAndRenderInstances() {
             }
         });
 
-        // Helper function to show messages
+        // Helper function to show messages using notifications
+        const notif = new Notification();
         const showMessage = (text, type = 'info', duration = 3000) => {
-            messageDiv.textContent = text;
-            messageDiv.className = `codigo-message ${type}`;
-            if (duration > 0) {
-                setTimeout(() => {
-                    messageDiv.textContent = '';
-                    messageDiv.className = 'codigo-message';
-                }, duration);
+            if (type === 'success') {
+                notif.success(text, duration);
+            } else if (type === 'error') {
+                notif.error(text, duration);
+            } else if (type === 'warning') {
+                notif.warning(text, duration);
+            } else {
+                notif.info(text, duration);
             }
         };
 
@@ -285,6 +287,12 @@ filterAndRenderInstances() {
             if (!codigo) {
                 console.warn('Empty code submitted');
                 showMessage('Ingresa un código', 'error', 2000);
+                return;
+            }
+
+            if (!/^[A-Za-z0-9]+$/.test(codigo)) {
+                console.warn('Invalid code format (contains special characters)');
+                showMessage('El código contiene caracteres inválidos', 'error', 2000);
                 return;
             }
 
@@ -309,11 +317,10 @@ filterAndRenderInstances() {
             console.log('Usuario detectado:', usuario);
             console.log('Código enviado:', codigo);
 
-            // Show loading message
-            showMessage('Validando código...', 'info', 0);
+            showMessage('Validando código...', 'info', 1500);
 
             try {
-                const response = await fetch(`http://mc.paellahosting.com:49158/api/validate.php`, {
+                const response = await fetch(`http://ext2.bytte.cloud:10878/LunarisClient/api/validate.php`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -329,24 +336,25 @@ filterAndRenderInstances() {
 
                 if (data.status === 'success') {
                     console.info('Acceso concedido a la instancia');
-                    showMessage('✓ Acceso concedido', 'success', 2500);
+                    showMessage('✓ Acceso concedido correctamente', 'success', 2500);
 
-                    // Refresh instance list after a short delay
                     setTimeout(async () => {
                         await this.loadInstances();
-                        // Notify home panel to refresh its avatars
                         document.dispatchEvent(new Event('instances-updated'));
                     }, 100);
                 } else if (data.status === 'error' && data.message === 'Ya tienes acceso a esta instancia') {
                     console.info('El usuario ya tiene esta instancia.');
-                    showMessage('Ya tienes acceso', 'info', 2500);
+                    showMessage('Ya tienes acceso a esta instancia', 'info', 2500);
+                } else if (data.status === 'error') {
+                    console.warn('Código inválido:', data.message);
+                    showMessage(`Código inválido: ${data.message || 'Verifica el código e intenta de nuevo'}`, 'error', 3000);
                 } else {
-                    console.info('Instancia no encontrada.');
-                    showMessage('Código inválido', 'error', 2500);
+                    console.warn('Respuesta inesperada del servidor');
+                    showMessage('Código inválido o no encontrado', 'error', 2500);
                 }
             } catch (error) {
                 console.error('Error en la petición:', error);
-                showMessage('Error de conexión', 'error', 3000);
+                showMessage('Error de conexión. Intenta de nuevo más tarde', 'error', 3000);
             }
         });
     }

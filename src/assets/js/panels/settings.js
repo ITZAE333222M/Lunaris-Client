@@ -3,7 +3,7 @@
  * @license CC-BY-NC 4.0 - https://creativecommons.org/licenses/by-nc/4.0
  */
 
-import { changePanel, database, Slider, popup } from '../utils.js'
+import { changePanel, database, Slider, Notification } from '../utils.js'
 const os = require('os');
 
 class Settings {
@@ -81,16 +81,10 @@ class Settings {
                 let configClient = await this.db.readData('configClient');
                 let account = await this.db.readData('accounts', configClient.account_selected);
                 
-                console.log('Abriendo popup de confirmación para:', account?.name);
+                console.log('Solicitando confirmación para cerrar sesión de:', account?.name);
                 
-                const confirmPopup = new popup();
-                const confirmed = await confirmPopup.openConfirm({
-                    title: 'Cerrar Sesión',
-                    content: `¿Estás seguro de que quieres cerrar sesión de <strong>${account?.name || 'Usuario'}</strong>?`,
-                    confirmText: 'Sí, cerrar sesión',
-                    cancelText: 'Cancelar',
-                    color: '#ff9999'
-                });
+                const notif = new Notification();
+                const confirmed = await notif.confirm(`¿Estás seguro de que quieres cerrar sesión de ${account?.name || 'Usuario'}?`, 'Cerrar Sesión');
                 
                 console.log('Resultado del popup:', confirmed);
                 
@@ -161,7 +155,8 @@ class Settings {
                 }
             } catch (err) {
                 console.error('Error durante logout:', err);
-                alert('Error al cerrar sesión: ' + err.message);
+                const notif = new Notification();
+                notif.error('Error al cerrar sesión: ' + err.message);
             }
         };
 
@@ -224,11 +219,28 @@ class Settings {
             ramMax: config.java_config.java_memory.max
         } : { ramMin: "1", ramMax: "2" };
 
-        if (totalMem < ram.ramMin) {
-            config.java_config.java_memory = { min: 1, max: 2 };
+        const maxAllowed = Math.trunc((80 * totalMem) / 100);
+        const minAllowed = 1;
+        
+        let ramMin = parseFloat(ram.ramMin) || 1;
+        let ramMax = parseFloat(ram.ramMax) || 2;
+        
+        let needsReset = false;
+        if (isNaN(ramMin) || ramMin < minAllowed || ramMin > maxAllowed) {
+            ramMin = 1;
+            needsReset = true;
+        }
+        if (isNaN(ramMax) || ramMax < minAllowed || ramMax > maxAllowed || ramMax <= ramMin) {
+            ramMax = Math.min(2, maxAllowed);
+            needsReset = true;
+        }
+        
+        if (needsReset) {
+            config.java_config.java_memory = { min: ramMin, max: ramMax };
             await this.db.updateData('configClient', config);
-            ram = { ramMin: "1", ramMax: "2" }
-        };
+        }
+        
+        ram = { ramMin: ramMin.toString(), ramMax: ramMax.toString() };
 
         let slider = new Slider(".memory-slider", parseFloat(ram.ramMin), parseFloat(ram.ramMax));
 
@@ -245,6 +257,19 @@ class Settings {
             config.java_config.java_memory = { min: min, max: max };
             await this.db.updateData('configClient', config);
         });
+
+        let ramResetBtn = document.querySelector(".ram-reset");
+        if (ramResetBtn) {
+            ramResetBtn.addEventListener("click", async () => {
+                let config = await this.db.readData('configClient');
+                config.java_config.java_memory = { min: 2, max: 4 };
+                slider.setMinValue(2);
+                slider.setMaxValue(4);
+                minSpan.setAttribute("value", "2 Go");
+                maxSpan.setAttribute("value", "4 Go");
+                await this.db.updateData('configClient', config);
+            });
+        }
     }
 
     async resolution() {

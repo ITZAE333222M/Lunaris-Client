@@ -1,7 +1,7 @@
 const { AZauth, Mojang } = require('minecraft-java-core');
 const { ipcRenderer } = require('electron');
 
-import { popup, database, changePanel, accountSelect, addAccount, config, setStatus } from '../utils.js';
+import { Notification, database, changePanel, accountSelect, addAccount, config, setStatus } from '../utils.js';
 
 class Login {
     static id = "login";
@@ -72,7 +72,7 @@ class Login {
 
     async getMicrosoft() {
         console.log('Initializing Microsoft login...');
-        const popupLogin = new popup();
+        const notif = new Notification();
         const microsoftBtn = document.querySelector('.connect-home');
 
         // Evitar duplicar listener
@@ -80,46 +80,30 @@ class Login {
         const btn = document.querySelector('.connect-home');
 
         btn.addEventListener("click", () => {
-            popupLogin.openPopup({
-                title: 'Conectando',
-                content: 'Espere por favor...',
-                color: 'var(--color)'
-            });
+            notif.info('Conectando...');
 
             ipcRenderer.invoke('Microsoft-window', this.config.client_id).then(async account_connect => {
                 if (!account_connect || account_connect === 'cancel') {
-                    popupLogin.closePopup();
                     return;
                 }
                 try {
                     await this.saveData(account_connect);
                 } catch (err) {
                     console.error('Error saving Microsoft account:', err);
-                    popupLogin.openPopup({
-                        title: 'Error',
-                        content: 'No se pudo guardar la cuenta de Microsoft. Intenta de nuevo.',
-                        options: true,
-                        color: 'red'
-                    });
+                    notif.error('No se pudo guardar la cuenta de Microsoft. Intenta de nuevo.');
                     return;
                 }
-                popupLogin.closePopup();
+                notif.success('Sesión iniciada correctamente');
             }).catch(err => {
                 console.error('Microsoft login error:', err);
-                popupLogin.closePopup();
-                popupLogin.openPopup({
-                    title: 'Error de Inicio de Sesión',
-                    content: `No se pudo conectar con Microsoft. Asegúrate de tener una conexión a internet activa.\n\nDetalles: ${err?.message || err || 'Error desconocido'}`,
-                    options: true,
-                    color: 'red'
-                });
+                notif.error(`Error de inicio de sesión: ${err?.message || 'Error desconocido'}`);
             });
         });
     }
 
     async getCrack() {
         console.log('Initializing offline login...');
-        const popupLogin = new popup();
+        const notif = new Notification();
         const emailOffline = document.querySelector('.email-offline');
         const connectOffline = document.querySelector('.connect-offline');
 
@@ -130,33 +114,21 @@ class Login {
         btn.addEventListener('click', async () => {
             const nick = emailOffline.value.trim();
             if (nick.length < 3) {
-                popupLogin.openPopup({
-                    title: 'Error',
-                    content: 'Tu Nick debe tener al menos 3 caracteres.',
-                    options: true
-                });
+                notif.error('Tu Nick debe tener al menos 3 caracteres.');
                 return;
             }
             if (nick.includes(' ')) {
-                popupLogin.openPopup({
-                    title: 'Error',
-                    content: 'Tu Nick no debe contener espacios.',
-                    options: true
-                });
+                notif.error('Tu Nick no debe contener espacios.');
                 return;
             }
 
             const MojangConnect = await Mojang.login(nick);
             if (MojangConnect.error) {
-                popupLogin.openPopup({
-                    title: 'Error',
-                    content: MojangConnect.message,
-                    options: true
-                });
+                notif.error(MojangConnect.message);
                 return;
             }
             await this.saveData(MojangConnect);
-            popupLogin.closePopup();
+            notif.success('Sesión iniciada correctamente');
         });
     }
 
@@ -168,13 +140,8 @@ class Login {
         // Validar que el nombre de usuario esté disponible
         if (!connectionData || !connectionData.name) {
             console.error('saveData: connectionData or name is missing', connectionData);
-            const popupError = new popup();
-            popupError.openPopup({
-                title: 'Error',
-                content: 'No se pudo obtener el nombre de usuario. Intenta de nuevo.',
-                color: 'red',
-                options: true
-            });
+            const notif = new Notification();
+            notif.error('No se pudo obtener el nombre de usuario. Intenta de nuevo.');
             return null;
         }
 

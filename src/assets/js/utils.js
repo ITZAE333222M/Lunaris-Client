@@ -12,6 +12,7 @@ import config from './utils/config.js';
 import database from './utils/database.js';
 import logger from './utils/logger.js';
 import popup from './utils/popup.js';
+import Notification from './utils/notification.js';
 import { skin2D } from './utils/skin.js';
 import slider from './utils/slider.js';
 
@@ -164,6 +165,7 @@ export {
     database as database,
     logger as logger,
     popup as popup,
+    Notification as Notification,
     setBackground as setBackground,
     skin2D as skin2D,
     addAccount as addAccount,

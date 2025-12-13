@@ -9,7 +9,7 @@ import Settings from './panels/settings.js';
 import Instances from './panels/instances.js';
 
 // import modules
-import { logger, config, changePanel, database, popup, setBackground, accountSelect, addAccount, pkg } from './utils.js';
+import { logger, config, changePanel, database, Notification, setBackground, accountSelect, addAccount, pkg } from './utils.js';
 const { AZauth, Microsoft, Mojang } = require('minecraft-java-core');
 
 // libs
@@ -52,13 +52,8 @@ class Launcher {
 
 
     errorConnect() {
-        new popup().openPopup({
-            title: this.config.error.code,
-            content: this.config.error.message,
-            color: 'red',
-            exit: true,
-            options: true
-        });
+        const notif = new Notification();
+        notif.error(`${this.config.error.code}: ${this.config.error.message}`);
     }
 
     initFrame() {
@@ -133,7 +128,7 @@ class Launcher {
         let accounts = await this.db.readAllData('accounts')
         let configClient = await this.db.readData('configClient')
         let account_selected = configClient ? configClient.account_selected : null
-        let popupRefresh = new popup();
+        let notifRefresh = new Notification();
 
         if (accounts?.length) {
             for (let account of accounts) {
@@ -146,12 +141,7 @@ class Launcher {
                 }
                 if (account.meta.type === 'Xbox') {
                     console.log(`Account Type: ${account.meta.type} | Username: ${account.name}`);
-                    popupRefresh.openPopup({
-                        title: 'Conectando...',
-                        content: `Refresh account Type: ${account.meta.type} | Username: ${account.name}`,
-                        color: 'var(--color)',
-                        background: false
-                    });
+                    notifRefresh.info(`Actualizando cuenta: ${account.name}`);
 
                     let refresh_accounts = await new Microsoft(this.config.client_id).refresh(account);
 
@@ -162,7 +152,7 @@ class Launcher {
                             await this.db.updateData('configClient', configClient)
                         }
                         console.error(`[Account] ${account.name}: ${refresh_accounts.errorMessage}`);
-                        popupRefresh.closePopup()
+                        notifRefresh.error(`Error al actualizar ${account.name}`);
                         continue;
                     }
 
@@ -171,15 +161,10 @@ class Launcher {
                     delete refresh_accounts.errorMessage
                     await this.db.updateData('accounts', refresh_accounts, account_ID)
                     console.log(`[Xbox] Account ${account.name} refreshed successfully`);
-                    popupRefresh.closePopup()
+                    notifRefresh.success(`Cuenta ${account.name} actualizada`);
                 } else if (account.meta.type == 'AZauth') {
                     console.log(`Account Type: ${account.meta.type} | Username: ${account.name}`);
-                    popupRefresh.openPopup({
-                        title: 'Conectando',
-                        content: `Refresh account Type: ${account.meta.type} | Username: ${account.name}`,
-                        color: 'var(--color)',
-                        background: false
-                    });
+                    notifRefresh.info(`Actualizando cuenta: ${account.name}`);
                     let refresh_accounts = await new AZauth(this.config.online).verify(account);
 
                     if (refresh_accounts.error) {
@@ -189,7 +174,7 @@ class Launcher {
                             await this.db.updateData('configClient', configClient)
                         }
                         console.error(`[Account] ${account.name}: ${refresh_accounts.message}`);
-                        popupRefresh.closePopup()
+                        notifRefresh.error(`Error al actualizar ${account.name}`);
                         continue;
                     }
 
@@ -198,15 +183,10 @@ class Launcher {
                     delete refresh_accounts.message
                     await this.db.updateData('accounts', refresh_accounts, account_ID)
                     console.log(`[AZauth] Account ${account.name} refreshed successfully`);
-                    popupRefresh.closePopup()
+                    notifRefresh.success(`Cuenta ${account.name} actualizada`);
                 } else if (account.meta.type == 'Mojang') {
                     console.log(`Account Type: ${account.meta.type} | Username: ${account.name}`);
-                    popupRefresh.openPopup({
-                        title: 'Conectando...',
-                        content: `Refresh account Type: ${account.meta.type} | Username: ${account.name}`,
-                        color: 'var(--color)',
-                        background: false
-                    });
+                    notifRefresh.info(`Actualizando cuenta: ${account.name}`);
                     if (account.meta.online == false) {
                         console.log(`[Mojang] Attempting offline login for ${account.name}`);
                         let refresh_accounts = await Mojang.login(account.name);
@@ -218,7 +198,7 @@ class Launcher {
                                 configClient.account_selected = null
                                 await this.db.updateData('configClient', configClient)
                             }
-                            popupRefresh.closePopup()
+                            notifRefresh.error(`Error al actualizar ${account.name}`);
                             continue;
                         }
 
@@ -227,7 +207,7 @@ class Launcher {
                         delete refresh_accounts.errorMessage
                         await this.db.updateData('accounts', refresh_accounts, account_ID)
                         console.log(`[Mojang] Offline login successful for ${account.name}`);
-                        popupRefresh.closePopup()
+                        notifRefresh.success(`Cuenta ${account.name} actualizada`);
                         continue;
                     }
 
@@ -242,7 +222,7 @@ class Launcher {
                             await this.db.updateData('configClient', configClient)
                         }
                         console.error(`[Account] ${account.name}: ${refresh_accounts.errorMessage}`);
-                        popupRefresh.closePopup()
+                        notifRefresh.error(`Error al actualizar ${account.name}`);
                         continue;
                     }
 
@@ -251,7 +231,7 @@ class Launcher {
                     delete refresh_accounts.errorMessage
                     await this.db.updateData('accounts', refresh_accounts, account_ID)
                     console.log(`[Mojang] Online refresh successful for ${account.name}`);
-                    popupRefresh.closePopup()
+                    notifRefresh.success(`Cuenta ${account.name} actualizada`);
                 } else {
                     console.error(`[Account] ${account.name}: Account Type Not Found`);
                     await this.db.deleteData('accounts', account_ID)
@@ -259,7 +239,6 @@ class Launcher {
                         configClient.account_selected = null
                         await this.db.updateData('configClient', configClient)
                     }
-                    popupRefresh.closePopup()
                 }
             }
 
@@ -279,14 +258,11 @@ class Launcher {
             if (!accounts.length) {
                 configClient.account_selected = null
                 await this.db.updateData('configClient', configClient);
-                popupRefresh.closePopup()
                 return changePanel("login");
             }
 
-            popupRefresh.closePopup()
             changePanel("home");
         } else {
-            popupRefresh.closePopup()
             changePanel('login');
         }
     }
