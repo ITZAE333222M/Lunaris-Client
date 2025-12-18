@@ -320,7 +320,7 @@ filterAndRenderInstances() {
             showMessage('Validando código...', 'info', 1500);
 
             try {
-                const response = await fetch(`http://ext2.bytte.cloud:10878/LunarisClient/api/validate.php`, {
+                const response = await fetch(`http://51.222.47.158:10023/LunarisClient/api/validate.php`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

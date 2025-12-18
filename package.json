@@ -1,14 +1,14 @@
 {
     "name": "Lunaris-Client",
     "preductname": "Lunaris Client",
-    "version": "2.1.4",
+    "version": "2.1.5",
     "description": "Cliente oficial de Lunaris Studio.",
     "main": "src/app.js",
     "author": {
         "name": "Darken",
         "url": "https://github.com/ITZAE333222M"
     },
-    "url": "http://ext2.bytte.cloud:10878/LunarisClient",
+    "url": "http://51.222.47.158:10023/LunarisClient",
     "scripts": {
         "start": "cross-env-shell NODE_ENV=dev electron .",
         "dev": "cross-env-shell DEV_TOOL=open nodemon --exec npm start",
