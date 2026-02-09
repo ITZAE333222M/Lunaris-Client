@@ -61,6 +61,13 @@ class Login {
     // Mostrar login Microsoft
     showMicrosoftLogin() {
         this.showTab('.login-home');
+        
+        // Asegurar que el botón cancelar sea visible
+        const cancelBtn = document.querySelector('.cancel-home');
+        if (cancelBtn) {
+            cancelBtn.style.display = ''; // Limpiar cualquier 'none' inline
+        }
+        
         this.getMicrosoft();
     }
 
@@ -78,11 +85,26 @@ class Login {
         // Evitar duplicar listener
         microsoftBtn.replaceWith(microsoftBtn.cloneNode(true));
         const btn = document.querySelector('.connect-home');
+        const originalText = btn.innerHTML; // Guardar texto original
 
         btn.addEventListener("click", () => {
             notif.info('Conectando...');
+            
+            // UI Loading State
+            btn.innerHTML = 'Esperando...';
+            btn.disabled = true;
+            btn.style.cursor = 'not-allowed';
+            btn.style.opacity = '0.7';
 
             ipcRenderer.invoke('Microsoft-window', this.config.client_id).then(async account_connect => {
+                console.log("Microsoft auth result:", account_connect);
+                
+                // Reset UI
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.style.cursor = 'pointer';
+                btn.style.opacity = '1';
+
                 if (!account_connect || account_connect === 'cancel') {
                     return;
                 }
@@ -95,9 +117,33 @@ class Login {
                 }
                 notif.success('Sesión iniciada correctamente');
             }).catch(err => {
+                // Reset UI on error
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.style.cursor = 'pointer';
+                btn.style.opacity = '1';
+                
                 console.error('Microsoft login error:', err);
                 notif.error(`Error de inicio de sesión: ${err?.message || 'Error desconocido'}`);
             });
+        });
+
+        // Asegurar que el botón de cancelar restaure el estado del botón de conectar
+        const cancelBtn = document.querySelector('.cancel-home');
+        // Clonar para limpiar listeners anteriores si los hubiera
+        cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+        const newCancelBtn = document.querySelector('.cancel-home');
+        
+        newCancelBtn.addEventListener('click', () => {
+             // Reset UI si el usuario cancela
+             const currentBtn = document.querySelector('.connect-home');
+             if(currentBtn) {
+                 currentBtn.innerHTML = 'Conectar'; // O usar originalText si estuviera en el scope, pero aquí hardcodeamos o asumimos
+                 currentBtn.disabled = false;
+                 currentBtn.style.cursor = 'pointer';
+                 currentBtn.style.opacity = '1';
+             }
+             this.showTab('.login-select');
         });
     }
 

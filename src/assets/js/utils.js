@@ -19,7 +19,7 @@ import slider from './utils/slider.js';
 async function setBackground(theme) {
     let body = document.body;
     body.className = theme ? 'dark global' : 'light global';
-    let backgroundPath = './assets/images/background/dark/1.png';
+    let backgroundPath = './assets/images/background/dark/2.png';
     body.style.backgroundImage = `linear-gradient(#00000000, #00000080), url(${backgroundPath})`;
     body.style.backgroundSize = 'cover';
 }
@@ -44,8 +44,6 @@ async function changePanel(id) {
             const activeContainerSettings = document.querySelector('.active-container-settings');
             if (activeSettingsBTN) activeSettingsBTN.classList.remove('active-settings-BTN');
             if (activeContainerSettings) activeContainerSettings.classList.remove('active-container-settings');
-            const cancelHome = document.querySelector('.cancel-home');
-            if (cancelHome) cancelHome.style.display = 'none';
         }
     } catch (err) {
         console.error('changePanel cleanup error', err);
@@ -108,6 +106,9 @@ async function accountSelect(data) {
         return;
     }
     
+    // Update Rich Presence
+    ipcRenderer.send('player-info-updated', { name: data.name, uuid: data.uuid });
+
     let activeAccount = document.querySelector('.account-select')
 
     if (activeAccount) activeAccount.classList.toggle('account-select');

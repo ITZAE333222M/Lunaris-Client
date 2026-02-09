@@ -184,13 +184,14 @@ input::-webkit-inner-spin-button {
 
 .popup-tab {
     width: 90%;
-    max-width: 550px;
+    max-width: 500px;
     padding: 2.5rem;
-    background: linear-gradient(135deg, rgba(44, 44, 44, 0.95) 0%, rgba(30, 30, 30, 0.98) 100%);
-    border: 2px solid rgba(147, 51, 234, 0.4);
-    border-radius: 20px;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
     z-index: 10;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     animation: slideUpPopup 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -207,22 +208,19 @@ input::-webkit-inner-spin-button {
 
 .popup-title {
     text-align: center;
-    font-size: 1.8rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #9333EA 0%, #d699ff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
     margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 2px solid rgba(147, 51, 234, 0.3);
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .popup-content {
     text-align: center;
     font-size: 1rem;
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(255, 255, 255, 0.8);
     margin-bottom: 2rem;
     min-height: 40px;
     display: flex;
@@ -239,29 +237,28 @@ input::-webkit-inner-spin-button {
 }
 
 .popup-button {
-    background: linear-gradient(135deg, #9333EA 0%, #b366ff 100%);
-    color: white;
+    background: #fff;
+    color: #000;
     border: none;
-    border-radius: 12px;
-    padding: 0.9rem 2.5rem;
-    font-size: 1rem;
-    font-weight: 700;
+    border-radius: 50px;
+    padding: 0.8rem 2.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 
 .popup-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(147, 51, 234, 0.5);
-    background: linear-gradient(135deg, #b366ff 0%, #d699ff 100%);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+    background: #fff;
 }
 
 .popup-button:active {
     transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
 }
 
 .popup-option-btn {
@@ -328,6 +325,7 @@ input::-webkit-inner-spin-button {
 /* Dynamic launcher background */
 body {
     background-color: var(--background);
+    background-image: url('../images/background/dark/2.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

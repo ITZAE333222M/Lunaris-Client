@@ -3,27 +3,27 @@
  * Luuxis License v1.0 (voir fichier LICENSE pour les détails en FR/EN)
  */
 
-const { app, ipcMain, nativeTheme } = require('electron');
+const { app, ipcMain, nativeTheme, shell } = require('electron');
 const { Microsoft } = require('minecraft-java-core');
 const { autoUpdater } = require('electron-updater')
 const path = require('path');
 const fs = require('fs');
-const RPC = require('discord-rpc'); // Importar discord-rpc
+const RPC = require('discord-rpc'); 
 
 const UpdateWindow = require("./assets/js/windows/updateWindow.js");
 const MainWindow = require("./assets/js/windows/mainWindow.js");
 
-// Configuración de Discord Rich Presence
 const CLIENT_ID = '1389689026914553967';
 RPC.register(CLIENT_ID);
 
-const rpc = new RPC.Client({ transport: 'ipc' });
+let rpc;
 
-// Variable para almacenar la instancia actual y el panel actual
 let currentInstance = 'Sin seleccionar';
 let currentPanel = 'home';
+let currentAvatar = 'launcher_logo';
+let currentPlayer = null;
 
-async function setActivity(instanceName = currentInstance, panelName = currentPanel) {
+async function setActivity(instanceName = currentInstance, panelName = currentPanel, avatar = currentAvatar) {
     if (!rpc) return;
 
     // Definir mensaje según el panel
@@ -34,24 +34,59 @@ async function setActivity(instanceName = currentInstance, panelName = currentPa
         details = 'En el login';
     }
 
+    let smallImageKey = 'icon';
+    let smallImageText = 'Lunaris Client';
+
+    if (currentPlayer) {
+        smallImageKey = `https://minotar.net/helm/${currentPlayer}`;
+        smallImageText = currentPlayer;
+    }
+
     rpc.setActivity({
         startTimestamp: new Date(),
-        largeImageKey: 'launcher_logo',
+        largeImageKey: avatar || 'launcher_logo',
         largeImageText: 'Lunaris Client',
-        smallImageKey: 'icon',
-        smallImageText: 'Preparándome para jugar',
+        smallImageKey: smallImageKey,
+        smallImageText: smallImageText,
         details: details,
         state: `Jugando: ${instanceName}`,
         instance: true,
-    });
+    }).catch(() => {});
 }
 
-rpc.on('ready', () => {
-    console.log('Rich Presence conectado.');
-    setActivity();
-});
+function initRPC() {
+    if (rpc) return;
+    rpc = new RPC.Client({ transport: 'ipc' });
 
-rpc.login({ clientId: CLIENT_ID }).catch(console.error);
+    rpc.on('ready', () => {
+        console.log('Rich Presence conectado.');
+        setActivity();
+    });
+
+    rpc.login({ clientId: CLIENT_ID }).catch(console.error);
+}
+
+function destroyRPC() {
+    if (!rpc) return;
+    rpc.clearActivity().catch(() => {});
+    rpc.destroy().catch(() => {});
+    rpc = null;
+    console.log('Rich Presence desconectado.');
+}
+
+function getDiscordRpcEnabled() {
+    try {
+        const userDataPath = app.getPath('userData');
+        const configPath = path.join(userDataPath, 'configClient.json');
+        if (fs.existsSync(configPath)) {
+            const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+            return config.discord_rpc !== false;
+        }
+    } catch (e) {
+        console.error("Error reading config for RPC:", e);
+    }
+    return true; // Default
+}
 
 // Configuración del launcher
 
@@ -65,6 +100,20 @@ if (dev) {
     app.setPath('userData', appPath);
     app.setPath('appData', appdata)
 }
+
+// Initialize RPC if enabled
+if (getDiscordRpcEnabled()) {
+    initRPC();
+}
+
+ipcMain.on('discord-rpc-toggle', (event, enabled) => {
+    if (enabled) {
+        initRPC();
+    } else {
+        destroyRPC();
+    }
+});
+
 
 if (!app.requestSingleInstanceLock()) app.quit();
 else app.whenReady().then(() => {
@@ -102,8 +151,39 @@ ipcMain.on('main-window-maximize', () => {
 ipcMain.on('main-window-hide', () => MainWindow.getWindow().hide())
 ipcMain.on('main-window-show', () => MainWindow.getWindow().show())
 
-ipcMain.handle('Microsoft-window', async (_, client_id) => {
-    return await new Microsoft(client_id).getAuth();
+ipcMain.handle('Microsoft-window', async (_, client_id_renderer) => {
+    // SV Launcher credentials and flow
+    const client_id = "28345b95-0610-4565-b77d-03a20a541560";
+    const client_secret = "9Bg8Q~NJTmVivAv2WUV_6wTxLPF3C27Ap_TFKdB-";
+    
+    // Fallback to renderer provided client_id if needed, but SV Launcher logic uses hardcoded
+    // const cid = client_id_renderer || client_id; 
+
+    const loginRedirect = fs.readFileSync(path.join(__dirname, "assets/login.html"), {
+        encoding: "utf-8"
+    });
+    
+    const ms = new Microsoft(client_id);
+    
+    try {
+        const mc = await ms.getAuth(
+            "raw",
+            void 0,
+            (url) => {
+                shell.openExternal(url);
+            },
+            loginRedirect
+        );
+        
+        if (!mc) return null;
+        console.log("Main Process: Microsoft auth successful", mc);
+        
+        // Return directly what getAuth returns (likely the account object)
+        return mc; 
+    } catch (e) {
+        console.error("Microsoft auth error:", e);
+        return null;
+    }
 })
 
 ipcMain.handle('is-dark-theme', (_, theme) => {
@@ -115,15 +195,22 @@ ipcMain.handle('is-dark-theme', (_, theme) => {
 // Escuchar cambios de instancia para actualizar el Rich Presence
 ipcMain.on('instance-changed', (event, data) => {
     currentInstance = data.instanceName;
-    setActivity(currentInstance, currentPanel);
+    currentAvatar = data.avatar || 'launcher_logo';
+    setActivity(currentInstance, currentPanel, currentAvatar);
     console.log(`Instancia cambió a: ${currentInstance}`);
 })
 
 // Escuchar cambios de panel para actualizar el Rich Presence
 ipcMain.on('panel-changed', (event, data) => {
     currentPanel = data.panelName;
-    setActivity(currentInstance, currentPanel);
+    setActivity(currentInstance, currentPanel, currentAvatar);
     console.log(`Panel cambió a: ${currentPanel}`);
+})
+
+ipcMain.on('player-info-updated', (event, data) => {
+    currentPlayer = data.name;
+    setActivity(currentInstance, currentPanel, currentAvatar);
+    console.log(`Player info updated: ${currentPlayer}`);
 })
 
 app.on('window-all-closed', () => app.quit());

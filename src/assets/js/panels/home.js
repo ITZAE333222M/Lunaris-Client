@@ -15,6 +15,17 @@ class Home {
         this.db = new database();
         this.lastWhitelistState = null;
         
+        // Reset instance selection on startup to ensure no instance is selected by default
+        try {
+            let configClient = await this.db.readData('configClient');
+            if (configClient && configClient.instance_selct) {
+                configClient.instance_selct = null;
+                await this.db.updateData('configClient', configClient);
+            }
+        } catch (e) {
+            console.warn('Error resetting instance selection on startup:', e);
+        }
+        
         // Load and display current account info
         await this.loadCurrentAccount();
         
@@ -68,6 +79,9 @@ class Home {
                     playerNameLabel.textContent = account.name;
                 }
                 
+                // Update Rich Presence with player info
+                ipcRenderer.send('player-info-updated', { name: account.name, uuid: account.uuid });
+
                 // Actualizar avatar del jugador
                 if (account?.profile?.skins[0]?.base64) {
                     const { skin2D } = await import('../utils/skin.js');
@@ -235,6 +249,7 @@ class Home {
 
     async news() {
         let newsElement = document.querySelector('.news-list');
+        if (!newsElement) return; // Prevent error if element doesn't exist
         let news = await config.getNews().then(res => res).catch(err => false);
 
         if (news) {
@@ -416,7 +431,10 @@ class Home {
                         notif.info(`Instancia seleccionada: ${instance.name}`);
 
                         // Notificar al Rich Presence sobre el cambio de instancia
-                        ipcRenderer.send('instance-changed', { instanceName: instance.name });
+                        ipcRenderer.send('instance-changed', { 
+                            instanceName: instance.name,
+                            avatar: avatar || 'launcher_logo' 
+                        });
 
                         // apply background, status, and music
                         try { this.setBackground(bg || null); } catch (e) { }
@@ -450,21 +468,21 @@ class Home {
         instanceBTN.style.display = 'flex';
 
         if (!instanceSelect) {
-            let newInstanceSelect = instancesList.find(i => !i.whitelistActive) || instancesList[0];
-            configClient.instance_selct = newInstanceSelect?.name;
-            instanceSelect = newInstanceSelect?.name;
-            await this.db.updateData('configClient', configClient);
+            // Do not auto-select an instance. Leave it as null.
+            // Disable play button or show "Select Instance" state if needed.
+            if (playBTN) playBTN.style.display = 'none';
         }
 
         for (let instance of instancesList) {
             if (instance.whitelistActive) {
                 let whitelist = instance.whitelist.find(w => w === auth?.name);
                 if (whitelist !== auth?.name && instance.name === instanceSelect) {
-                    let newInstanceSelect = instancesList.find(i => !i.whitelistActive) || instancesList[0];
-                    configClient.instance_selct = newInstanceSelect?.name;
-                    instanceSelect = newInstanceSelect?.name;
-                    setStatus(newInstanceSelect?.status);
+                    // If current selection is invalid due to whitelist, deselect it
+                    configClient.instance_selct = null;
+                    instanceSelect = null;
                     await this.db.updateData('configClient', configClient);
+                    if (playBTN) playBTN.style.display = 'none';
+                    // Do not auto-select another one
                 }
             } else if (instance.name === instanceSelect) setStatus(instance.status);
         }
@@ -638,13 +656,12 @@ class Home {
 
         // Start launch (handle both sync and Promise-returning implementations)
         try {
-            console.log('Calling launch.Launch with opt:', opt);
-            const maybePromise = launch.Launch(opt);
-            // If returns a promise, await to catch immediate rejections
-            if (maybePromise && typeof maybePromise.then === 'function') {
-                await maybePromise.catch(launchErr => { throw launchErr; });
-            }
-            console.log('launch.Launch invoked successfully');
+            console.log('Calling launch.config with opt:', opt);
+            await launch.config(opt);
+            console.log('Calling launch.start');
+            const maybePromise = await launch.start();
+             
+            console.log('launch.start invoked successfully');
         } catch (launchErr) {
             console.error('launch.Launch threw an exception:', launchErr);
             notifGame.error(`Error al lanzar: ${launchErr?.message || String(launchErr)}`);

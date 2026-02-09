@@ -5,6 +5,7 @@
 
 import { changePanel, database, Slider, Notification } from '../utils.js'
 const os = require('os');
+const { ipcRenderer } = require('electron');
 
 class Settings {
     static id = "settings";
@@ -23,7 +24,8 @@ class Settings {
         await Promise.all([
             this.ram(),
             this.resolution(),
-            this.launcher()
+            this.launcher(),
+            this.discordRpc()
         ]);
         
         // Listen for login completion to reload account info
@@ -45,10 +47,6 @@ class Settings {
         const saveBtn = document.querySelector('#save.settings-close-btn');
         if (saveBtn) {
             saveBtn.addEventListener('click', () => {
-                // Hide any temporary UI that could remain (e.g., cancel button in login)
-                const cancelHome = document.querySelector('.cancel-home');
-                if (cancelHome) cancelHome.style.display = 'none';
-
                 changePanel('home')
             })
         }
@@ -302,6 +300,41 @@ class Settings {
             height.value = '480';
             await this.db.updateData('configClient', configClient);
         })
+    }
+
+    async discordRpc() {
+        let configClient = await this.db.readData('configClient');
+        let rpcEnabled = configClient?.discord_rpc !== false; // Default true
+
+        let rpcBtn = document.querySelector("#discord-rpc-toggle");
+        if (!rpcBtn) return;
+        
+        let rpcSpan = rpcBtn.querySelector("span");
+
+        const updateUI = (enabled) => {
+            if (enabled) {
+                rpcBtn.classList.add('active-close');
+                rpcSpan.textContent = "Activado";
+            } else {
+                rpcBtn.classList.remove('active-close');
+                rpcSpan.textContent = "Desactivado";
+            }
+        };
+
+        updateUI(rpcEnabled);
+
+        rpcBtn.addEventListener("click", async () => {
+            let config = await this.db.readData('configClient');
+            // If undefined, treat as true, so next state is false
+            let currentState = config.discord_rpc !== false;
+            let newState = !currentState;
+
+            config.discord_rpc = newState;
+            await this.db.updateData('configClient', config);
+            
+            updateUI(newState);
+            ipcRenderer.send('discord-rpc-toggle', newState);
+        });
     }
 
     async launcher() {
