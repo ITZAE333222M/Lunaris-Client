@@ -4,7 +4,10 @@
  */
 
 const { app, ipcMain, nativeTheme, shell } = require('electron');
-const { Microsoft } = require('@d4rken/minecraft-java-core');
+// javascript-obfuscator:disable
+const mclib = require('@d4rken/minecraft-java-core');
+const Microsoft = mclib.Microsoft;
+// javascript-obfuscator:enable
 const { autoUpdater } = require('electron-updater')
 const path = require('path');
 const fs = require('fs');

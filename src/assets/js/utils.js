@@ -4,7 +4,9 @@
  */
 
 const { ipcRenderer } = require('electron')
+// javascript-obfuscator:disable
 const { Status } = require('@d4rken/minecraft-java-core')
+// javascript-obfuscator:enable
 const fs = require('fs');
 const pkg = require('../package.json');
 

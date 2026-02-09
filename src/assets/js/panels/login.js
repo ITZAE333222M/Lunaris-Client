@@ -1,4 +1,8 @@
-const { AZauth, Mojang } = require('@d4rken/minecraft-java-core');
+// javascript-obfuscator:disable
+const mclib = require('@d4rken/minecraft-java-core');
+const AZauth = mclib.AZauth;
+const Mojang = mclib.Mojang;
+// javascript-obfuscator:enable
 const { ipcRenderer } = require('electron');
 
 import { Notification, database, changePanel, accountSelect, addAccount, config, setStatus } from '../utils.js';
