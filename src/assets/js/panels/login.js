@@ -112,6 +112,10 @@ class Login {
                 if (!account_connect || account_connect === 'cancel') {
                     return;
                 }
+                if (account_connect?.error) {
+                    notif.error(`Error de inicio de sesión: ${account_connect.message || 'Error desconocido'}`);
+                    return;
+                }
                 try {
                     await this.saveData(account_connect);
                 } catch (err) {

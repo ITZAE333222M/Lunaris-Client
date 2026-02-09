@@ -159,7 +159,7 @@ ipcMain.handle('Microsoft-window', async (_, client_id_renderer) => {
     // SV Launcher credentials and flow
     const client_id = "28345b95-0610-4565-b77d-03a20a541560";
     const client_secret = "9Bg8Q~NJTmVivAv2WUV_6wTxLPF3C27Ap_TFKdB-";
-    
+
     // Fallback to renderer provided client_id if needed, but SV Launcher logic uses hardcoded
     // const cid = client_id_renderer || client_id; 
 
@@ -172,12 +172,16 @@ ipcMain.handle('Microsoft-window', async (_, client_id_renderer) => {
     // javascript-obfuscator:enable
     
     try {
+        const port = 8888;
+        // Ensure redirect is set for raw flow and open the browser explicitly
+        ms.redirect = `http://localhost:${port}`;
+        const authUrl = ms.createUrl();
+        shell.openExternal(authUrl);
+
         const mc = await ms.getAuth(
             "raw",
-            void 0,
-            (url) => {
-                shell.openExternal(url);
-            },
+            port,
+            undefined,
             loginRedirect
         );
         
@@ -188,7 +192,7 @@ ipcMain.handle('Microsoft-window', async (_, client_id_renderer) => {
         return mc; 
     } catch (e) {
         console.error("Microsoft auth error:", e);
-        return null;
+        return { error: true, message: e?.message || "Microsoft auth error" };
     }
 })
 
