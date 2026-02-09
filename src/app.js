@@ -6,6 +6,8 @@
 const { app, ipcMain, nativeTheme, shell } = require('electron');
 // javascript-obfuscator:disable
 const mclib = require('@d4rken/minecraft-java-core');
+// Prefer explicit class ref to avoid obfuscation/case issues in prod builds
+const MicrosoftAuth = mclib.Microsoft || mclib.microsoft || require('@d4rken/minecraft-java-core/build/Authenticator/Microsoft.js').default;
 // javascript-obfuscator:enable
 const { autoUpdater } = require('electron-updater')
 const path = require('path');
@@ -158,9 +160,6 @@ ipcMain.handle('Microsoft-window', async (_, client_id_renderer) => {
     const client_id = "28345b95-0610-4565-b77d-03a20a541560";
     const client_secret = "9Bg8Q~NJTmVivAv2WUV_6wTxLPF3C27Ap_TFKdB-";
     
-    console.log("mclib contents:", mclib);
-    console.log("mclib keys:", Object.keys(mclib));
-
     // Fallback to renderer provided client_id if needed, but SV Launcher logic uses hardcoded
     // const cid = client_id_renderer || client_id; 
 
@@ -169,7 +168,7 @@ ipcMain.handle('Microsoft-window', async (_, client_id_renderer) => {
     });
     
     // javascript-obfuscator:disable
-    const ms = new mclib.Microsoft(client_id);
+    const ms = new MicrosoftAuth(client_id);
     // javascript-obfuscator:enable
     
     try {
