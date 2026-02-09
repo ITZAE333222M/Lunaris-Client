@@ -42,7 +42,9 @@ class Index {
             if (extFile == 'js') {
                 let code = fs.readFileSync(path, "utf8");
                 code = code.replace(/src\//g, 'app/');
-                if (this.obf) {
+                const hasObfDisable = code.includes("javascript-obfuscator:disable");
+                const isMainProcess = fileName === 'app.js';
+                if (this.obf && !hasObfDisable && !isMainProcess) {
                     await new Promise((resolve) => {
                         console.log(`Obfuscate ${path}`);
                         let obf = JavaScriptObfuscator.obfuscate(code, { optionsPreset: 'medium-obfuscation', disableConsoleOutput: false });
