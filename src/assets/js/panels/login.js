@@ -1,4 +1,4 @@
-const { AZauth, Mojang } = require('minecraft-java-core');
+const { AZauth, Mojang } = require('@d4rken/minecraft-java-core');
 const { ipcRenderer } = require('electron');
 
 import { Notification, database, changePanel, accountSelect, addAccount, config, setStatus } from '../utils.js';

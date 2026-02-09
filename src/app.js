@@ -4,7 +4,7 @@
  */
 
 const { app, ipcMain, nativeTheme, shell } = require('electron');
-const { Microsoft } = require('minecraft-java-core');
+const { Microsoft } = require('@d4rken/minecraft-java-core');
 const { autoUpdater } = require('electron-updater')
 const path = require('path');
 const fs = require('fs');

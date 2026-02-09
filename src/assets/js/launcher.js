@@ -10,7 +10,7 @@ import Instances from './panels/instances.js';
 
 // import modules
 import { logger, config, changePanel, database, Notification, setBackground, accountSelect, addAccount, pkg } from './utils.js';
-const { AZauth, Microsoft, Mojang } = require('minecraft-java-core');
+const { AZauth, Microsoft, Mojang } = require('@d4rken/minecraft-java-core');
 
 // libs
 const { ipcRenderer } = require('electron');

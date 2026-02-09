@@ -4,7 +4,7 @@
  */
 import { config, database, logger, changePanel, appdata, setStatus, pkg, Notification } from '../utils.js'
 
-const { Launch } = require('minecraft-java-core')
+const { Launch } = require('@d4rken/minecraft-java-core')
 const { shell, ipcRenderer } = require('electron')
 
 class Home {
