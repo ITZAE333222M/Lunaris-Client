@@ -173,15 +173,12 @@ ipcMain.handle('Microsoft-window', async (_, client_id_renderer) => {
     
     try {
         const port = 8888;
-        // Ensure redirect is set for raw flow and open the browser explicitly
-        ms.redirect = `http://localhost:${port}`;
-        const authUrl = ms.createUrl();
-        shell.openExternal(authUrl);
-
         const mc = await ms.getAuth(
             "raw",
             port,
-            undefined,
+            (url) => {
+                shell.openExternal(url);
+            },
             loginRedirect
         );
         
