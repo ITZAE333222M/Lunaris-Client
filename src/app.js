@@ -163,9 +163,14 @@ ipcMain.handle('Microsoft-window', async (_, client_id_renderer) => {
     // Fallback to renderer provided client_id if needed, but SV Launcher logic uses hardcoded
     // const cid = client_id_renderer || client_id; 
 
-    const loginRedirect = fs.readFileSync(path.join(__dirname, "assets/login.html"), {
-        encoding: "utf-8"
-    });
+    let loginRedirect = null;
+    try {
+        loginRedirect = fs.readFileSync(path.join(__dirname, "assets/login.html"), {
+            encoding: "utf-8"
+        });
+    } catch (e) {
+        loginRedirect = "<html><body>You can close this window now.</body></html>";
+    }
     
     // javascript-obfuscator:disable
     const ms = new MicrosoftAuth(client_id);
@@ -182,7 +187,7 @@ ipcMain.handle('Microsoft-window', async (_, client_id_renderer) => {
             loginRedirect
         );
         
-        if (!mc) return null;
+        if (!mc) return "cancel";
         console.log("Main Process: Microsoft auth successful", mc);
         
         // Return directly what getAuth returns (likely the account object)
