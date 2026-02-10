@@ -155,49 +155,6 @@ ipcMain.on('main-window-maximize', () => {
 ipcMain.on('main-window-hide', () => MainWindow.getWindow().hide())
 ipcMain.on('main-window-show', () => MainWindow.getWindow().show())
 
-ipcMain.handle('Microsoft-window', async (_, client_id_renderer) => {
-    // SV Launcher credentials and flow
-    const client_id = "28345b95-0610-4565-b77d-03a20a541560";
-    const client_secret = "9Bg8Q~NJTmVivAv2WUV_6wTxLPF3C27Ap_TFKdB-";
-
-    // Fallback to renderer provided client_id if needed, but SV Launcher logic uses hardcoded
-    // const cid = client_id_renderer || client_id; 
-
-    let loginRedirect = null;
-    try {
-        loginRedirect = fs.readFileSync(path.join(__dirname, "assets/login.html"), {
-            encoding: "utf-8"
-        });
-    } catch (e) {
-        loginRedirect = "<html><body>You can close this window now.</body></html>";
-    }
-    
-    // javascript-obfuscator:disable
-    const ms = new MicrosoftAuth(client_id);
-    // javascript-obfuscator:enable
-    
-    try {
-        const port = 8888;
-        const mc = await ms.getAuth(
-            "raw",
-            port,
-            (url) => {
-                shell.openExternal(url);
-            },
-            loginRedirect
-        );
-        
-        if (!mc) return "cancel";
-        console.log("Main Process: Microsoft auth successful", mc);
-        
-        // Return directly what getAuth returns (likely the account object)
-        return mc; 
-    } catch (e) {
-        console.error("Microsoft auth error:", e);
-        return { error: true, message: e?.message || "Microsoft auth error" };
-    }
-})
-
 ipcMain.handle('is-dark-theme', (_, theme) => {
     if (theme === 'dark') return true
     if (theme === 'light') return false

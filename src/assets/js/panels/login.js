@@ -3,7 +3,7 @@ const mclib = require('@d4rken/minecraft-java-core');
 const AZauth = mclib.AZauth;
 const Mojang = mclib.Mojang;
 // javascript-obfuscator:enable
-const { ipcRenderer } = require('electron');
+const { shell } = require('electron');
 
 import { Notification, database, changePanel, accountSelect, addAccount, config, setStatus } from '../utils.js';
 
@@ -91,7 +91,7 @@ class Login {
         const btn = document.querySelector('.connect-home');
         const originalText = btn.innerHTML; // Guardar texto original
 
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", async () => {
             notif.info('Conectando...');
             
             // UI Loading State
@@ -100,9 +100,22 @@ class Login {
             btn.style.cursor = 'not-allowed';
             btn.style.opacity = '0.7';
 
-            ipcRenderer.invoke('Microsoft-window', this.config.client_id).then(async account_connect => {
+            try {
+                // Browser + localhost flow (no Microsoft-window IPC)
+                const MicrosoftAuth = mclib.Microsoft || mclib.microsoft || require('@d4rken/minecraft-java-core/build/Authenticator/Microsoft.js').default;
+                const ms = new MicrosoftAuth(this.config.client_id);
+                const loginRedirect = "<html><body>You can close this window now.</body></html>";
+                const account_connect = await ms.getAuth(
+                    "raw",
+                    8888,
+                    (url) => {
+                        shell.openExternal(url);
+                    },
+                    loginRedirect
+                );
+
                 console.log("Microsoft auth result:", account_connect);
-                
+
                 // Reset UI
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -124,16 +137,16 @@ class Login {
                     return;
                 }
                 notif.success('Sesión iniciada correctamente');
-            }).catch(err => {
+            } catch (err) {
                 // Reset UI on error
                 btn.innerHTML = originalText;
                 btn.disabled = false;
                 btn.style.cursor = 'pointer';
                 btn.style.opacity = '1';
-                
+
                 console.error('Microsoft login error:', err);
                 notif.error(`Error de inicio de sesión: ${err?.message || 'Error desconocido'}`);
-            });
+            }
         });
 
         // Asegurar que el botón de cancelar restaure el estado del botón de conectar
